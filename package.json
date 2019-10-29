@@ -1,0 +1,20 @@
+{
+  "name": "mobx-persist-store",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf lib && tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "mobx": "^5.14.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/runtime": "^7.6.2",
+    "@types/node": "^12.7.11"
+  }
+}
