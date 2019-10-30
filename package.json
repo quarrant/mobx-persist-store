@@ -5,6 +5,13 @@
   "author": "quarrant",
   "license": "MIT",
   "main": "lib/index.js",
+  "keywords": [
+    "mobx",
+    "persist",
+    "mobx-persist",
+    "react-native",
+    "react"
+  ],
   "homepage": "https://github.com/quarrant/mobx-persist-store#readme",
   "repository": {
     "type": "git",
