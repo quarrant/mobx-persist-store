@@ -9,29 +9,29 @@ Persist and rehydrate observable properties in mobx store.
 ## Usage
 
 ```javascript
-import { action, observable } from "mobx";
-import { PersistStore, StorageAdapter } from "mobx-persist-store";
+import { action, observable } from 'mobx';
+import { PersistStore, StorageAdapter } from 'mobx-persist-store';
 
-function readStore(name: string) {
+function readStore(name) {
   return new Promise(resolve => {
     const data = localStorage.getItem(name);
     resolve(JSON.parse(data));
   });
 }
 
-function writeStore(name: string, content: string) {
+function writeStore(name) {
   return new Promise(resolve => {
     localStorage.setItem(name, JSON.stringify(content));
     resolve();
   });
 }
 
-class CounterStore extends PersistStore<CounterStore> {
+class CounterStore extends PersistStore {
   @observable counter: number = 0;
 
   constructor() {
     super({
-      properties: ["counter"],
+      properties: ['counter'],
       adapter: new StorageAdapter({
         read: readStore,
         write: writeStore
