@@ -1,14 +1,22 @@
 {
   "name": "mobx-persist-store",
   "version": "0.0.1",
-  "description": "",
+  "description": "Mobx Persist Store",
+  "author": "quarrant",
+  "license": "MIT",
   "main": "lib/index.js",
+  "homepage": "https://github.com/quarrant/mobx-persist-store#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quarrant/mobx-persist-store.git"
+  },
+  "bugs": {
+    "url": "https://github.com/quarrant/mobx-persist-store/issues"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf lib && tsc"
   },
-  "author": "",
-  "license": "ISC",
   "peerDependencies": {
     "mobx": "^5.14.0"
   },
