@@ -8,6 +8,8 @@ Persist and rehydrate observable properties in mobx store.
 
 ## Usage
 
+Use the StorageAdapter to connect to your library from cache. It can be anything that is able to read and write data. For ReactNative it may be AsyncStorage, FS, etc. and for React - localStorage, sessionStorage, etc.
+
 ```javascript
 import { action, observable } from 'mobx';
 import { PersistStore, StorageAdapter } from 'mobx-persist-store';
