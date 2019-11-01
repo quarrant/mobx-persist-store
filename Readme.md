@@ -21,7 +21,7 @@ function readStore(name) {
   });
 }
 
-function writeStore(name) {
+function writeStore(name, content) {
   return new Promise(resolve => {
     localStorage.setItem(name, JSON.stringify(content));
     resolve();
