@@ -12,6 +12,48 @@ Use the StorageAdapter to connect to your library from cache. It can be anything
 
 ```javascript
 import { action, observable } from 'mobx';
+import { persistConfigure, StorageAdapter } from 'mobx-persist-store';
+
+function readStore(name) {
+  return new Promise(resolve => {
+    const data = localStorage.getItem(name);
+    resolve(JSON.parse(data));
+  });
+}
+
+function writeStore(name, content) {
+  return new Promise(resolve => {
+    localStorage.setItem(name, JSON.stringify(content));
+    resolve();
+  });
+}
+
+class CounterStore {
+  @observable counter: number = 0;
+
+  constructor() {
+    persistConfigure(this, {
+      properties: ['counter'],
+      adapter: new StorageAdapter({
+        read: readStore,
+        write: writeStore
+      }),
+      delay: 2000 // optional
+    });
+  }
+
+  @action tickCounter = () => {
+    this.counter = this.counter + 1;
+  };
+}
+
+export default new CounterStore();
+```
+
+## Usage (Deprecated)
+
+```javascript
+import { action, observable } from 'mobx';
 import { PersistStore, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {

@@ -21,7 +21,7 @@
     "url": "https://github.com/quarrant/mobx-persist-store/issues"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "rm -rf lib && tsc"
   },
   "peerDependencies": {
@@ -30,6 +30,18 @@
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/runtime": "^7.6.2",
-    "@types/node": "^12.7.11"
+    "@types/jest": "^24.0.21",
+    "@types/node": "^12.7.11",
+    "jest": "^24.9.0"
+  },
+  "jest": {
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
   }
 }

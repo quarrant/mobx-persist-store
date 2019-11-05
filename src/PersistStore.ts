@@ -14,6 +14,10 @@ export default class PersistStore<T = {}> {
   @observable isSynchronized: boolean = false;
 
   constructor(options: Options<T>) {
+    console.warn(
+      'PersistStore is deprecated. Use persistConfigure in constructor instead of PersistStore'
+    );
+
     if (!options.delay) options.delay = 5000;
 
     observe(this, ({ object }: { object: Partial<T> }) => {

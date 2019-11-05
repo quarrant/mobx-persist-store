@@ -4,8 +4,8 @@ interface Options {
 }
 
 export default class StorageAdapter {
-  private write!: Options['write'];
-  private read!: Options['read'];
+  private write: Options['write'];
+  private read: Options['read'];
 
   constructor(options: Options) {
     this.write = options.write;
@@ -19,6 +19,7 @@ export default class StorageAdapter {
         .then(() => resolve())
         .catch(error => {
           console.log('StorageAdapter.writeInStorage', error);
+          reject(error);
         });
     });
   }
