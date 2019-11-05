@@ -1,13 +1,10 @@
 import { reaction, extendObservable, IReactionDisposer } from 'mobx';
 
-interface Adapter<T> {
-  write: (name: string, content: T) => Promise<Error | undefined>;
-  read: (name: string) => Promise<T | undefined>;
-}
+import StorageAdapter from './StorageAdapter';
 
 interface Options<T> {
   properties: (keyof T)[];
-  adapter: Adapter<T>;
+  adapter: StorageAdapter;
   delay?: number;
 }
 
@@ -39,14 +36,14 @@ export default function persistConfigure<T>(
   options.properties.forEach(property => {
     const disposer = reaction(
       () => target[property],
-      () => options.adapter.write(target.constructor.name, target),
+      () => options.adapter.writeInStorage(target.constructor.name, target),
       reactionOptions
     );
 
     disposers.push(disposer);
   });
 
-  options.adapter.read(target.constructor.name).then(content => {
+  options.adapter.readFromStorage<T>(target.constructor.name).then(content => {
     if (content) {
       getKeys(content).forEach(property => {
         target[property] = content[property];
