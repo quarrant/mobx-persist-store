@@ -17,7 +17,7 @@ export default class StorageAdapter {
       const contentString = JSON.stringify(content);
       this.write(name, contentString)
         .then(() => resolve())
-        .catch(error => {
+        .catch((error) => {
           console.log('StorageAdapter.writeInStorage', error);
           reject(error);
         });
@@ -27,13 +27,13 @@ export default class StorageAdapter {
   readFromStorage<T>(name: string): Promise<T | undefined> {
     return new Promise((resolve, reject) => {
       this.read(name)
-        .then(content => {
+        .then((content) => {
           if (content) {
             const contentObject = JSON.parse(content);
             resolve(contentObject);
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log('StorageAdapter.readFromStorage', error);
           reject(error);
         });

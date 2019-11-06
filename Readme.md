@@ -17,14 +17,14 @@ import { action, observable } from 'mobx';
 import { persistConfigure, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const data = localStorage.getItem(name);
     resolve(JSON.parse(data));
   });
 }
 
 function writeStore(name, content) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     localStorage.setItem(name, JSON.stringify(content));
     resolve();
   });
@@ -38,9 +38,9 @@ class CounterStore {
       properties: ['counter'],
       adapter: new StorageAdapter({
         read: readStore,
-        write: writeStore
+        write: writeStore,
       }),
-      delay: 2000 // optional
+      delay: 2000, // optional
     });
   }
 
@@ -59,14 +59,14 @@ import { action, observable } from 'mobx';
 import { PersistStore, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const data = localStorage.getItem(name);
     resolve(JSON.parse(data));
   });
 }
 
 function writeStore(name, content) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     localStorage.setItem(name, JSON.stringify(content));
     resolve();
   });
@@ -80,8 +80,8 @@ class CounterStore extends PersistStore {
       properties: ['counter'],
       adapter: new StorageAdapter({
         read: readStore,
-        write: writeStore
-      })
+        write: writeStore,
+      }),
     });
   }
 
@@ -91,4 +91,15 @@ class CounterStore extends PersistStore {
 }
 
 export default new CounterStore();
+```
+
+## API reference
+
+### `persistConfigure`
+
+```ts
+persistConfigure(this, options: {
+  propertis: (keyof T)[];
+  adapter: StorageAdapter
+})
 ```

@@ -1,4 +1,4 @@
-import { reaction, extendObservable, IReactionDisposer } from 'mobx';
+import { reaction, extendObservable, isObservable, IReactionDisposer } from 'mobx';
 
 import StorageAdapter from './StorageAdapter';
 
@@ -13,17 +13,14 @@ type Synchronize<T> = T & {
 };
 
 function dispose(disposers: IReactionDisposer[]) {
-  disposers.forEach(disposer => disposer());
+  disposers.forEach((disposer) => disposer());
 }
 
 function getKeys<T>(object: T) {
   return Object.keys(object) as (keyof T)[];
 }
 
-export default function persistConfigure<T>(
-  target: Synchronize<T>,
-  options: Options<T>
-) {
+export default function persistConfigure<T>(target: Synchronize<T>, options: Options<T>) {
   if (!options.delay) options.delay = 5000;
 
   if (!target.hasOwnProperty('isSynchronized')) {
@@ -33,19 +30,25 @@ export default function persistConfigure<T>(
   const disposers: IReactionDisposer[] = [];
   const reactionOptions = { delay: options.delay };
 
-  options.properties.forEach(property => {
+  options.properties.forEach((property) => {
+    if (!isObservable(target[property])) {
+      console.warn('The property `' + property + '` is not observable and not affected reaction.');
+
+      return;
+    }
+
     const disposer = reaction(
       () => target[property],
       () => options.adapter.writeInStorage(target.constructor.name, target),
-      reactionOptions
+      reactionOptions,
     );
 
     disposers.push(disposer);
   });
 
-  options.adapter.readFromStorage<T>(target.constructor.name).then(content => {
+  options.adapter.readFromStorage<T>(target.constructor.name).then((content) => {
     if (content) {
-      getKeys(content).forEach(property => {
+      getKeys(content).forEach((property) => {
         target[property] = content[property];
       });
     }
