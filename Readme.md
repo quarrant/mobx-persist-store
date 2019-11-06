@@ -92,14 +92,3 @@ class CounterStore extends PersistStore {
 
 export default new CounterStore();
 ```
-
-## API reference
-
-### `persistConfigure`
-
-```ts
-persistConfigure(this, options: {
-  propertis: (keyof T)[];
-  adapter: StorageAdapter
-})
-```
