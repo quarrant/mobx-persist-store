@@ -2,6 +2,8 @@
 
 Persist and rehydrate observable properties in mobx store.
 
+[![npm version](https://img.shields.io/npm/v/mobx-persist-store.svg?style=flat-square)](https://www.npmjs.com/package/mobx-persist-store) [![npm downloads](https://img.shields.io/npm/dm/mobx-persist-store.svg?style=flat-square)](https://www.npmjs.com/package/mobx-persist-store)
+
 ## Installation
 
 `$ yarn add mobx-persist-store`
