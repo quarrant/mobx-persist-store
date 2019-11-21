@@ -1,4 +1,4 @@
-import { reaction, extendObservable, isObservable, IReactionDisposer } from 'mobx';
+import { reaction, extendObservable, isObservable, IReactionDisposer, ObservableMap } from 'mobx';
 
 import StorageAdapter from './StorageAdapter';
 
@@ -33,7 +33,6 @@ export default function persistConfigure<T>(target: Synchronize<T>, options: Opt
   options.properties.forEach((property) => {
     if (!isObservable(target[property])) {
       console.warn('The property `' + property + '` is not observable and not affected reaction.');
-
       return;
     }
 
@@ -49,7 +48,17 @@ export default function persistConfigure<T>(target: Synchronize<T>, options: Opt
   options.adapter.readFromStorage<T>(target.constructor.name).then((content) => {
     if (content) {
       getKeys(content).forEach((property) => {
-        target[property] = content[property];
+        if (target[property] instanceof ObservableMap) {
+          const targetPartial = target[property];
+          const observableMap = new Map(
+            getKeys(content[property]).reduce<[keyof typeof targetPartial, Record<string, any>][]>((p, k) => {
+              return p.concat([k, content[property][k]]);
+            }, []),
+          );
+          target[property] = (observableMap as unknown) as typeof targetPartial;
+        } else {
+          target[property] = content[property];
+        }
       });
     }
 
