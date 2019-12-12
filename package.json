@@ -29,10 +29,18 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/plugin-proposal-decorators": "^7.7.4",
+    "@babel/preset-env": "^7.7.6",
+    "@babel/preset-react": "^7.7.4",
+    "@babel/preset-typescript": "^7.7.4",
     "@babel/runtime": "^7.6.2",
     "@types/jest": "^24.0.21",
     "@types/node": "^12.7.11",
-    "jest": "^24.9.0"
+    "babel-plugin-transform-typescript-metadata": "^0.2.2",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.3"
   },
   "jest": {
     "modulePaths": [
@@ -42,6 +50,16 @@
       "ts",
       "tsx",
       "js"
+    ],
+    "transform": {
+      "^.+\\.ts?$": "ts-jest"
+    },
+    "testPathIgnorePatterns": [
+      "\\.snap$",
+      "<rootDir>/node_modules/"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!react-native)/"
     ]
   }
 }
