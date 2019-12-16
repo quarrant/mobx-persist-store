@@ -1,4 +1,4 @@
-import { reaction, observable, isObservableProp, IReactionDisposer, ObservableMap, IObservableValue } from 'mobx';
+import { reaction, isObservableProp, IReactionDisposer, ObservableMap } from 'mobx';
 
 import StorageAdapter from './StorageAdapter';
 
@@ -9,7 +9,7 @@ interface Options<T> {
 }
 
 type Synchronize<T> = T & {
-  isSynchronized: IObservableValue<boolean>;
+  isSynchronized?: boolean;
 };
 
 function dispose(disposers: IReactionDisposer[]) {
@@ -20,17 +20,22 @@ function getKeys<T>(object: T) {
   return Object.keys(object) as (keyof T)[];
 }
 
+function notObservableProp(property: string) {
+  console.warn('The property `' + property + '` is not observable and not affected reaction.');
+}
+
 export default function persistConfigure<T>(target: Synchronize<T>, options: Options<T>) {
   if (!options.delay) options.delay = 5000;
+  if (!isObservableProp(target, 'isSynchronized')) notObservableProp('isSynchronized');
 
-  target.isSynchronized = observable.box(false);
+  target.isSynchronized = false;
 
   const disposers: IReactionDisposer[] = [];
   const reactionOptions = { delay: options.delay };
 
   options.properties.forEach((property) => {
-    if (!isObservableProp(target, property as string)) {
-      console.warn('The property `' + property + '` is not observable and not affected reaction.');
+    if (!isObservableProp(target, String(property))) {
+      notObservableProp(String(property));
       return;
     }
 
@@ -60,7 +65,7 @@ export default function persistConfigure<T>(target: Synchronize<T>, options: Opt
       });
     }
 
-    target.isSynchronized.set(true);
+    target.isSynchronized = true;
   });
 
   return {
