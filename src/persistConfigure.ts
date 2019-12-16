@@ -1,4 +1,4 @@
-import { reaction, observable, isObservable, IReactionDisposer, ObservableMap, IObservableValue } from 'mobx';
+import { reaction, observable, isObservableProp, IReactionDisposer, ObservableMap, IObservableValue } from 'mobx';
 
 import StorageAdapter from './StorageAdapter';
 
@@ -29,7 +29,7 @@ export default function persistConfigure<T>(target: Synchronize<T>, options: Opt
   const reactionOptions = { delay: options.delay };
 
   options.properties.forEach((property) => {
-    if (!isObservable(target[property])) {
+    if (!isObservableProp(target, property as string)) {
       console.warn('The property `' + property + '` is not observable and not affected reaction.');
       return;
     }
