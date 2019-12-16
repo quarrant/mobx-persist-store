@@ -1,4 +1,4 @@
-import { reaction, extendObservable, isObservable, IReactionDisposer, ObservableMap } from 'mobx';
+import { reaction, observable, isObservable, IReactionDisposer, ObservableMap, IObservableValue } from 'mobx';
 
 import StorageAdapter from './StorageAdapter';
 
@@ -9,7 +9,7 @@ interface Options<T> {
 }
 
 type Synchronize<T> = T & {
-  isSynchronized?: boolean;
+  isSynchronized: IObservableValue<boolean>;
 };
 
 function dispose(disposers: IReactionDisposer[]) {
@@ -23,9 +23,7 @@ function getKeys<T>(object: T) {
 export default function persistConfigure<T>(target: Synchronize<T>, options: Options<T>) {
   if (!options.delay) options.delay = 5000;
 
-  if (!target.hasOwnProperty('isSynchronized')) {
-    extendObservable(target, { isSynchronized: false });
-  }
+  target.isSynchronized = observable.box(false);
 
   const disposers: IReactionDisposer[] = [];
   const reactionOptions = { delay: options.delay };
@@ -57,12 +55,12 @@ export default function persistConfigure<T>(target: Synchronize<T>, options: Opt
           );
           target[property] = (observableMap as unknown) as typeof targetPartial;
         } else {
-          target[property] = content[property];
+          (target as T)[property] = content[property];
         }
       });
     }
 
-    target.isSynchronized = true;
+    target.isSynchronized.set(true);
   });
 
   return {
