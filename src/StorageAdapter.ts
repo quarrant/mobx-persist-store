@@ -12,7 +12,7 @@ export default class StorageAdapter {
     this.read = options.read;
   }
 
-  writeInStorage<T>(name: string, content: T) {
+  writeInStorage<T>(name: string, content: T): Promise<void | Error> {
     return new Promise((resolve, reject) => {
       const contentString = JSON.stringify(content);
       this.write(name, contentString)

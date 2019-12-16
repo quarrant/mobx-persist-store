@@ -65,5 +65,8 @@ export default function persistConfigure<T>(target: Synchronize<T>, options: Opt
     target.isSynchronized = true;
   });
 
-  return () => dispose(disposers);
+  return {
+    disposer: () => dispose(disposers),
+    clear: () => options.adapter.writeInStorage(name, {}),
+  };
 }
