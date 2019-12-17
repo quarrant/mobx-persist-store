@@ -22,7 +22,8 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "rm -rf lib && tsc"
+    "build": "rm -rf lib && tsc",
+    "prepublishOnly": "yarn build"
   },
   "peerDependencies": {
     "mobx": "^5.14.0"
