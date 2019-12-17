@@ -32,6 +32,7 @@ export default class StorageAdapter {
             const contentObject = JSON.parse(content);
             resolve(contentObject);
           }
+          resolve(undefined);
         })
         .catch((error) => {
           console.log('StorageAdapter.readFromStorage', error);

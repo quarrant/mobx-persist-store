@@ -25,7 +25,6 @@ function notObservableProp(property: string) {
 }
 
 export default function persistConfigure<T>(target: Synchronize<T>, options: Options<T>) {
-  if (!options.delay) options.delay = 5000;
   if (!isObservableProp(target, 'isSynchronized')) notObservableProp('isSynchronized');
 
   target.isSynchronized = false;
@@ -53,14 +52,19 @@ export default function persistConfigure<T>(target: Synchronize<T>, options: Opt
       getKeys(content).forEach((property) => {
         if (target[property] instanceof ObservableMap) {
           const targetPartial = target[property];
-          const observableMap = new Map(
-            getKeys(content[property]).reduce<[keyof typeof targetPartial, Record<string, any>][]>((p, k) => {
-              return p.concat([k, content[property][k]]);
-            }, []),
+
+          const mapSource = getKeys(content[property]).reduce<[keyof typeof targetPartial, Record<string, any>][]>(
+            (p, k) => {
+              p.push([k, content[property][k]]);
+              return p;
+            },
+            [],
           );
+          const observableMap = new Map(mapSource);
+
           target[property] = (observableMap as unknown) as typeof targetPartial;
         } else {
-          (target as T)[property] = content[property];
+          target[property] = content[property];
         }
       });
     }
@@ -70,6 +74,6 @@ export default function persistConfigure<T>(target: Synchronize<T>, options: Opt
 
   return {
     disposer: () => dispose(disposers),
-    clear: () => options.adapter.writeInStorage(name, {}),
+    clear: () => options.adapter.writeInStorage(target.constructor.name, {}),
   };
 }
