@@ -40,7 +40,10 @@ export default function persistConfigure<T>(target: Synchronize<T>, options: Opt
 
     const disposer = reaction(
       () => target[property],
-      () => options.adapter.writeInStorage(target.constructor.name, target),
+      () => {
+        const { isSynchronized, ...rest } = target;
+        options.adapter.writeInStorage(target.constructor.name, rest);
+      },
       reactionOptions,
     );
 
