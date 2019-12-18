@@ -25,6 +25,8 @@ function notObservableProp(property: string) {
 }
 
 export default function persistConfigure<T>(target: Synchronize<T>, options: Options<T>) {
+  console.warn('persistConfigure is deprecated. Use usePersist in constructor instead of persistConfigure.');
+
   if (!isObservableProp(target, 'isSynchronized')) notObservableProp('isSynchronized');
 
   target.isSynchronized = false;
