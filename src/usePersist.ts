@@ -14,20 +14,17 @@ function getKeys<T>(object: T) {
 }
 
 function getObservableTargetObject<T extends Object>(target: T, properties: (keyof T)[]) {
-  return properties.reduce(
-    (result, property) => {
-      if (target.hasOwnProperty(property)) {
-        return { ...result, [property]: target[property] };
-      }
+  return properties.reduce((result, property) => {
+    if (target.hasOwnProperty(property)) {
+      return { ...result, [property]: target[property] };
+    }
 
-      return result;
-    },
-    {} as T,
-  );
+    return result;
+  }, {} as T);
 }
 
 export default function usePersist<T extends Object>(target: T, options: Options<T>) {
-  StorageConfiguration.setAdapter(target, options.adapter);
+  StorageConfiguration.setAdapter(target.constructor.name, options.adapter);
 
   const disposers: IReactionDisposer[] = [];
 
@@ -49,7 +46,7 @@ export default function usePersist<T extends Object>(target: T, options: Options
     disposers.push(disposer);
   });
 
-  StorageConfiguration.setDisposers(target, disposers);
+  StorageConfiguration.setDisposers(target.constructor.name, disposers);
 
   options.adapter.readFromStorage<T>(target.constructor.name).then((content) => {
     if (content) {
@@ -73,6 +70,6 @@ export default function usePersist<T extends Object>(target: T, options: Options
       });
     }
 
-    StorageConfiguration.setIsSynchronized(target, true);
+    StorageConfiguration.setIsSynchronized(target.constructor.name, true);
   });
 }

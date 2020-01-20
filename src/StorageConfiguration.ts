@@ -7,28 +7,28 @@ class StorageConfiguration {
   private disposersMap: Map<string, IReactionDisposer[]> = new Map();
   private isSynchronizedMap: Map<string, boolean> = observable.map();
 
-  setAdapter = <T extends Object>(target: T, adapter: StorageAdapter) => {
-    this.adapterMap.set(target.constructor.name, adapter);
+  setAdapter = (targetName: string, adapter: StorageAdapter) => {
+    this.adapterMap.set(targetName, adapter);
   };
 
-  setDisposers = <T extends Object>(target: T, disposers: IReactionDisposer[]) => {
-    this.disposersMap.set(target.constructor.name, disposers);
+  setDisposers = (targetName: string, disposers: IReactionDisposer[]) => {
+    this.disposersMap.set(targetName, disposers);
   };
 
-  @action setIsSynchronized = <T extends Object>(target: T, isSynchronized: boolean) => {
-    this.isSynchronizedMap.set(target.constructor.name, isSynchronized);
+  @action setIsSynchronized = (targetName: string, isSynchronized: boolean) => {
+    this.isSynchronizedMap.set(targetName, isSynchronized);
   };
 
-  getAdapter = <T extends Object>(target: T) => {
-    return this.adapterMap.get(target.constructor.name);
+  getAdapter = (targetName: string) => {
+    return this.adapterMap.get(targetName);
   };
 
-  getDisposers = <T extends Object>(target: T) => {
-    return this.disposersMap.get(target.constructor.name) || [];
+  getDisposers = (targetName: string) => {
+    return this.disposersMap.get(targetName) || [];
   };
 
-  getIsSynchronized = <T extends Object>(target: T) => {
-    return this.isSynchronizedMap.get(target.constructor.name) || false;
+  getIsSynchronized = (targetName: string) => {
+    return this.isSynchronizedMap.get(targetName) || false;
   };
 }
 
