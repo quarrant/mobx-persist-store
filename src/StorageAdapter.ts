@@ -29,7 +29,8 @@ export default class StorageAdapter {
       this.read(name)
         .then((content) => {
           if (content) {
-            const contentObject = JSON.parse(content);
+            const repairedContent = new RegExp(/{.*}/).exec(content);
+            const contentObject = repairedContent ? JSON.parse(repairedContent[0]) : undefined;
             resolve(contentObject);
           }
           resolve(undefined);
