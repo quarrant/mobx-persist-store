@@ -13,8 +13,8 @@ Persist and rehydrate observable properties in mobx store.
 Use the StorageAdapter to connect to your library from cache. It can be anything that is able to read and write data. For ReactNative it may be AsyncStorage, FS, etc. and for React - localStorage, sessionStorage, etc.
 
 ```javascript
-import { action, observable } from 'mobx';
-import { persistConfigure, StorageAdapter } from 'mobx-persist-store';
+import { action, observable, computed } from 'mobx';
+import { usePersist, useClear, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {
   return new Promise((resolve) => {
@@ -34,60 +34,33 @@ class CounterStore {
   @observable counter: number = 0;
 
   constructor() {
-    persistConfigure(this, {
+    usePersist(this, {
       properties: ['counter'],
       adapter: new StorageAdapter({
         read: readStore,
         write: writeStore,
       }),
-      delay: 2000, // optional
+      reactionOptions: {
+        delay: 2000
+      },
     });
   }
 
   @action tickCounter = () => {
     this.counter = this.counter + 1;
   };
-}
 
-export default new CounterStore();
-```
-
-## Usage (Deprecated)
-
-```javascript
-import { action, observable } from 'mobx';
-import { PersistStore, StorageAdapter } from 'mobx-persist-store';
-
-function readStore(name) {
-  return new Promise((resolve) => {
-    const data = localStorage.getItem(name);
-    resolve(JSON.parse(data));
-  });
-}
-
-function writeStore(name, content) {
-  return new Promise((resolve) => {
-    localStorage.setItem(name, JSON.stringify(content));
-    resolve();
-  });
-}
-
-class CounterStore extends PersistStore {
-  @observable counter: number = 0;
-
-  constructor() {
-    super({
-      properties: ['counter'],
-      adapter: new StorageAdapter({
-        read: readStore,
-        write: writeStore,
-      }),
-    });
+  @action clearStore = () => {
+    useClear(this)
   }
 
-  @action tickCounter = () => {
-    this.counter = this.counter + 1;
-  };
+  @action persistDespose = () => {
+    useDisposers(this)
+  }
+
+  @computed get isSynchronized() => {
+    return isSynchronized(this)
+  }
 }
 
 export default new CounterStore();
