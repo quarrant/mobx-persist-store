@@ -49,7 +49,7 @@ export default function persistenceDecorator(options: Options) {
     StorageConfiguration.setAdapter(options.name, options.adapter);
 
     const properties = options.properties as (keyof T)[];
-    const targetPrototype = target as T & { _asJS: IComputedValue<string>; _storageName: string };
+    const targetPrototype = target.prototype as T & { _asJS: IComputedValue<string>; _storageName: string };
 
     extendObservable(targetPrototype, {
       _storageName: options.name,
