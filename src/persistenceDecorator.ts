@@ -46,11 +46,13 @@ function getObservableTargetObject<T extends Object>(target: T, properties: (key
 }
 
 export default function persistenceDecorator(options: Options) {
-  StorageConfiguration.setAdapter(options.name, options.adapter);
+  return function<T extends { new (...args: any[]): {} }>(target: T) {
+    StorageConfiguration.setAdapter(options.name, options.adapter);
 
-  return function<T extends Object>(target: T) {
     const properties = options.properties as (keyof T)[];
-    const selfTarget = target as T & { _asJS: IComputedValue<string> };
+    const selfTarget = target as T & { _asJS: IComputedValue<string>; _storageName: string };
+
+    selfTarget._storageName = options.name;
 
     extendObservable(selfTarget, {
       _asJS: computed(function() {
@@ -60,25 +62,28 @@ export default function persistenceDecorator(options: Options) {
 
     const disposer = reaction(
       () => selfTarget._asJS,
-      (jsObject) => options.adapter.writeInStorage(options.name, jsObject),
+      (jsObject) => options.adapter.writeInStorage(selfTarget._storageName, jsObject),
       options.reactionOptions,
     );
 
-    StorageConfiguration.setDisposers(options.name, [disposer]);
+    StorageConfiguration.setDisposers(selfTarget._storageName, [disposer]);
 
-    options.adapter.readFromStorage<T>(options.name).then((content) => {
+    options.adapter.readFromStorage<typeof selfTarget>(selfTarget._storageName).then((content) => {
       if (content) {
         getKeys(content).forEach((property) => {
-          if (target[property] instanceof ObservableMap) {
-            const targetPartial = target[property];
-            const mapSource = getKeys(content[property]).reduce<[keyof T[keyof T], Record<string, any>][]>((p, k) => {
-              p.push([k, content[property][k]]);
-              return p;
-            }, []);
+          if (selfTarget[property] instanceof ObservableMap) {
+            const targetPartial = selfTarget[property];
+            const mapSource = getKeys(content[property]).reduce<[keyof typeof targetPartial, Record<string, any>][]>(
+              (p, k) => {
+                p.push([k, content[property][k]]);
+                return p;
+              },
+              [],
+            );
             const observableMap = new Map(mapSource);
-            target[property] = (observableMap as unknown) as typeof targetPartial;
+            selfTarget[property] = (observableMap as unknown) as typeof targetPartial;
           } else {
-            target[property] = content[property];
+            selfTarget[property] = content[property];
           }
         });
       }
