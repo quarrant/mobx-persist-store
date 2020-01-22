@@ -1,7 +1,6 @@
 import {
   IReactionOptions,
   extendObservable,
-  computed,
   isComputedProp,
   IComputedValue,
   reaction,
@@ -30,7 +29,7 @@ function getObservableTargetObject<T extends Object>(target: T, properties: (key
 
     if (!observableProperty || computedProperty) {
       if (computedProperty) {
-        console.log('The property `' + property + '` is computed and will not persist.');
+        console.warn('The property `' + property + '` is computed and will not persist.');
         return result;
       }
 
@@ -50,29 +49,28 @@ export default function persistenceDecorator(options: Options) {
     StorageConfiguration.setAdapter(options.name, options.adapter);
 
     const properties = options.properties as (keyof T)[];
-    const selfTarget = target as T & { _asJS: IComputedValue<string>; _storageName: string };
+    const targetPrototype = target as T & { _asJS: IComputedValue<string>; _storageName: string };
 
-    selfTarget._storageName = options.name;
-
-    extendObservable(selfTarget, {
-      _asJS: computed(function() {
-        return getObservableTargetObject(selfTarget, properties);
-      }),
+    extendObservable(targetPrototype, {
+      _storageName: options.name,
+      get _asJS() {
+        return getObservableTargetObject(targetPrototype, properties);
+      },
     });
 
     const disposer = reaction(
-      () => selfTarget._asJS,
-      (jsObject) => options.adapter.writeInStorage(selfTarget._storageName, jsObject),
+      () => targetPrototype._asJS,
+      (jsObject) => options.adapter.writeInStorage(targetPrototype._storageName, jsObject),
       options.reactionOptions,
     );
 
-    StorageConfiguration.setDisposers(selfTarget._storageName, [disposer]);
+    StorageConfiguration.setDisposers(targetPrototype._storageName, [disposer]);
 
-    options.adapter.readFromStorage<typeof selfTarget>(selfTarget._storageName).then((content) => {
+    options.adapter.readFromStorage<typeof targetPrototype>(targetPrototype._storageName).then((content) => {
       if (content) {
         getKeys(content).forEach((property) => {
-          if (selfTarget[property] instanceof ObservableMap) {
-            const targetPartial = selfTarget[property];
+          if (targetPrototype[property] instanceof ObservableMap) {
+            const targetPartial = targetPrototype[property];
             const mapSource = getKeys(content[property]).reduce<[keyof typeof targetPartial, Record<string, any>][]>(
               (p, k) => {
                 p.push([k, content[property][k]]);
@@ -81,14 +79,14 @@ export default function persistenceDecorator(options: Options) {
               [],
             );
             const observableMap = new Map(mapSource);
-            selfTarget[property] = (observableMap as unknown) as typeof targetPartial;
+            targetPrototype[property] = (observableMap as unknown) as typeof targetPartial;
           } else {
-            selfTarget[property] = content[property];
+            targetPrototype[property] = content[property];
           }
         });
       }
 
-      StorageConfiguration.setIsSynchronized(options.name, true);
+      StorageConfiguration.setIsSynchronized(targetPrototype._storageName, true);
     });
   };
 }
