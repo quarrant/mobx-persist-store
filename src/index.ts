@@ -1,8 +1,4 @@
 import StorageAdapter from './StorageAdapter';
-
-/**
- * new version
- */
 import useDisposers from './useDisposers';
 import useClear from './useClear';
 import isSynchronized from './isSynchronized';
