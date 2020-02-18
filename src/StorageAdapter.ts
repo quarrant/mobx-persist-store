@@ -1,13 +1,10 @@
-interface Options {
-  write: (name: string, value: string) => Promise<Error | undefined>;
-  read: (name: string) => Promise<string | undefined>;
-}
+import { StorageAdapterOptions } from './types';
 
 export default class StorageAdapter {
-  private write: Options['write'];
-  private read: Options['read'];
+  private write: StorageAdapterOptions['write'];
+  private read: StorageAdapterOptions['read'];
 
-  constructor(options: Options) {
+  constructor(options: StorageAdapterOptions) {
     this.write = options.write;
     this.read = options.read;
   }

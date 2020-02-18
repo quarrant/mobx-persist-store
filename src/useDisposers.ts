@@ -1,6 +1,7 @@
 import StorageConfiguration from './StorageConfiguration';
+import { PersistenceStore } from './types';
 
-export default function useDisposers<T extends Object>(target: T & { _storageName?: string }) {
-  const disposers = StorageConfiguration.getDisposers(target._storageName || target.constructor.name);
+export default function useDisposers<T extends Object>(target: PersistenceStore<T>) {
+  const disposers = StorageConfiguration.getDisposers(target);
   disposers.forEach((disposers) => disposers());
 }

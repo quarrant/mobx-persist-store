@@ -1,15 +1,8 @@
-import {
-  IReactionOptions,
-  extendObservable,
-  isComputedProp,
-  IComputedValue,
-  reaction,
-  isObservableProp,
-  ObservableMap,
-} from 'mobx';
+import { IReactionOptions, extendObservable, isComputedProp, reaction, isObservableProp, ObservableMap } from 'mobx';
 
 import StorageAdapter from './StorageAdapter';
 import StorageConfiguration from './StorageConfiguration';
+import { PersistenceStore } from './types';
 
 type Options = {
   name: string;
@@ -45,11 +38,11 @@ function getObservableTargetObject<T extends Object>(target: T, properties: (key
 }
 
 export default function persistenceDecorator(options: Options) {
-  return function<T extends { new (...args: any[]): {} }>(target: T) {
+  return function<T extends { new <A>(...args: A[]): {} }>(target: T) {
     StorageConfiguration.setAdapter(options.name, options.adapter);
 
     const properties = options.properties as (keyof T)[];
-    const targetPrototype = target.prototype as T & { _asJS: IComputedValue<string>; _storageName: string };
+    const targetPrototype = target.prototype as PersistenceStore<T>;
 
     extendObservable(targetPrototype, {
       _storageName: options.name,
@@ -64,7 +57,7 @@ export default function persistenceDecorator(options: Options) {
       options.reactionOptions,
     );
 
-    StorageConfiguration.setDisposers(targetPrototype._storageName, [disposer]);
+    StorageConfiguration.setDisposers(targetPrototype, [disposer]);
 
     options.adapter.readFromStorage<typeof targetPrototype>(targetPrototype._storageName).then((content) => {
       if (content) {
@@ -86,7 +79,7 @@ export default function persistenceDecorator(options: Options) {
         });
       }
 
-      StorageConfiguration.setIsSynchronized(targetPrototype._storageName, true);
+      StorageConfiguration.setIsSynchronized(targetPrototype, true);
     });
   };
 }

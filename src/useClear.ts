@@ -1,7 +1,8 @@
 import StorageConfiguration from './StorageConfiguration';
+import { PersistenceStore } from './types';
 
-export default function useClear<T extends Object>(target: T & { _storageName?: string }) {
-  const storageAdapter = StorageConfiguration.getAdapter(target._storageName || target.constructor.name);
+export default function useClear<T extends Object>(target: PersistenceStore<T>) {
+  const storageAdapter = StorageConfiguration.getAdapter(target);
   if (storageAdapter) {
     return storageAdapter.writeInStorage(target._storageName || target.constructor.name, {});
   }
