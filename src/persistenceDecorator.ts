@@ -45,6 +45,7 @@ export default function persistenceDecorator(options: Options) {
     const targetPrototype = target.prototype as PersistenceStore<T>;
 
     extendObservable(targetPrototype, {
+      _isPersistence: true,
       _storageName: options.name,
       get _asJS() {
         return getObservableTargetObject(targetPrototype, properties);
@@ -81,5 +82,7 @@ export default function persistenceDecorator(options: Options) {
 
       StorageConfiguration.setIsSynchronized(targetPrototype, true);
     });
+
+    return target as PersistenceStore<T>;
   };
 }

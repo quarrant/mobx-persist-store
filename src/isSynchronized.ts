@@ -1,6 +1,8 @@
 import StorageConfiguration from './StorageConfiguration';
-import { PersistenceStore } from './types';
+import isPersistence from './isPersistence';
 
-export default function isSynchronized<T extends Object>(target: PersistenceStore<T>) {
-  return StorageConfiguration.getIsSynchronized(target);
+export default function isSynchronized<T>(target: T) {
+  if (isPersistence(target)) {
+    return StorageConfiguration.getIsSynchronized(target);
+  }
 }

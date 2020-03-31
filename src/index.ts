@@ -1,7 +1,8 @@
-import StorageAdapter from './StorageAdapter';
-import useDisposers from './useDisposers';
-import useClear from './useClear';
+import isPersistence from './isPersistence';
 import isSynchronized from './isSynchronized';
 import persistence from './persistenceDecorator';
+import StorageAdapter from './StorageAdapter';
+import useClear from './useClear';
+import useDisposers from './useDisposers';
 
-export { StorageAdapter, useDisposers, useClear, isSynchronized, persistence };
+export { isPersistence, isSynchronized, persistence, StorageAdapter, useClear, useDisposers };

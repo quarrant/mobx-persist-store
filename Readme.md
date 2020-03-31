@@ -52,7 +52,7 @@ class CounterStore {
     useClear(this)
   }
 
-  @action persistDespose = () => {
+  @action persistDispose = () => {
     useDisposers(this)
   }
 
@@ -60,6 +60,69 @@ class CounterStore {
     return isSynchronized(this)
   }
 }
+
+export default new CounterStore();
+```
+
+## Without decorators
+
+```javascript
+import { action, observable, computed, decorate } from 'mobx';
+import { persistence, useClear, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
+
+function readStore(name) {
+  return new Promise((resolve) => {
+    const data = localStorage.getItem(name);
+    resolve(JSON.parse(data));
+  });
+}
+
+function writeStore(name, content) {
+  return new Promise((resolve) => {
+    localStorage.setItem(name, JSON.stringify(content));
+    resolve();
+  });
+}
+
+class CounterStore {
+  counter: number = 0;
+
+  tickCounter = () => {
+    this.counter = this.counter + 1;
+  };
+
+  clearStore = () => {
+    useClear(this)
+  }
+
+  persistDespose = () => {
+    useDisposers(this)
+  }
+
+  get isSynchronized() => {
+    return isSynchronized(this)
+  }
+}
+
+decorator(CounterStore, {
+  counter: observable,
+  tickCounter: action,
+  clearStore: action,
+  persistDispose: action,
+  isSynchronized: computed
+})
+
+persistence({
+  name: 'CounterStore',
+  properties: ['counter'],
+  adapter: new StorageAdapter({
+    read: readStore,
+    write: writeStore,
+  }),
+  reactionOptions: { // optional
+    delay: 2000
+  },
+})(CounterStore);
 
 export default new CounterStore();
 ```

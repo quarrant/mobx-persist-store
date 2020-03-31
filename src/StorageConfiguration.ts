@@ -8,37 +8,28 @@ class StorageConfiguration<T> {
   private disposersMap: Map<string, IReactionDisposer[]> = new Map();
   private isSynchronizedMap: Map<string, boolean> = observable.map();
 
-  private getStorageNameFromTarget = (target: PersistenceStore<T>) => {
-    return target._storageName || target.constructor.name;
-  };
-
   setAdapter = (storageName: string, adapter: StorageAdapter) => {
     this.adapterMap.set(storageName, adapter);
   };
 
   setDisposers = (target: PersistenceStore<T>, disposers: IReactionDisposer[]) => {
-    const storageName = this.getStorageNameFromTarget(target);
-    this.disposersMap.set(storageName, disposers);
+    this.disposersMap.set(target._storageName, disposers);
   };
 
   @action setIsSynchronized = (target: PersistenceStore<T>, isSynchronized: boolean) => {
-    const storageName = this.getStorageNameFromTarget(target);
-    this.isSynchronizedMap.set(storageName, isSynchronized);
+    this.isSynchronizedMap.set(target._storageName, isSynchronized);
   };
 
   getAdapter = (target: PersistenceStore<T>) => {
-    const storageName = this.getStorageNameFromTarget(target);
-    return this.adapterMap.get(storageName);
+    return this.adapterMap.get(target._storageName);
   };
 
   getDisposers = (target: PersistenceStore<T>) => {
-    const storageName = this.getStorageNameFromTarget(target);
-    return this.disposersMap.get(storageName) || [];
+    return this.disposersMap.get(target._storageName) || [];
   };
 
   getIsSynchronized = (target: PersistenceStore<T>) => {
-    const storageName = this.getStorageNameFromTarget(target);
-    return this.isSynchronizedMap.get(storageName) || false;
+    return this.isSynchronizedMap.get(target._storageName) || false;
   };
 }
 
