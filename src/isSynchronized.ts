@@ -6,5 +6,6 @@ export default function isSynchronized<T>(target: T) {
     return StorageConfiguration.getIsSynchronized(target);
   }
 
-  return true;
+  console.warn('Only stores that persistence can use `isSynchronized` function.');
+  return false;
 }
