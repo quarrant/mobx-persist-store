@@ -38,7 +38,7 @@ function getObservableTargetObject<T extends Object>(target: T, properties: (key
 }
 
 export default function persistenceDecorator(options: Options) {
-  return function<T extends { new <A>(...args: A[]): {} }>(target: T) {
+  return function<T extends { new (...args: any): {} }>(target: T) {
     StorageConfiguration.setAdapter(options.name, options.adapter);
 
     const properties = options.properties as (keyof T)[];
