@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2017",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
