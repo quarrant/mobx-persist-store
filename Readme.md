@@ -104,7 +104,7 @@ class CounterStore {
   }
 }
 
-decorator(CounterStore, {
+decorate(CounterStore, {
   counter: observable,
   tickCounter: action,
   clearStore: action,
