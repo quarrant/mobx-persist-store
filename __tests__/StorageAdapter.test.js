@@ -19,18 +19,30 @@ function testReadFromJson(name) {
   });
 }
 
-describe('StorageAdapter', () => {
-  const storage = new StorageAdapter({ write: testWriteInJson, read: testReadFromJson });
+const storage = new StorageAdapter({ write: testWriteInJson, read: testReadFromJson })
 
-  it('writeInStorage', () => {
-    return storage.writeInStorage('testWrite', { test: 'testContent' }).then(() => {
-      expect(testStorage['testWrite']).toEqual(JSON.stringify({ test: 'testContent' }));
-    });
-  });
+const mockStore = {
+  4: "test",
+  5: 1,
+  6: 1.15,
+  7: { 0: 'a' },
+  8: [1, 1],
+  9: 1e15
+}
 
-  it('readFromStorage', () => {
-    return storage.readFromStorage('testRead').then((content) => {
-      expect(content).toEqual({ test: 'testContent' });
+describe('mock store', () => {
+
+  beforeAll(() => {
+    storage.writeInStorage('mockStore', mockStore)
+  })
+  
+  it(`writeInStore`, () => {
+    expect(testStorage['mockStore']).toEqual(JSON.stringify(mockStore));
+  })
+
+  it(`readFromStore`, () => {
+    storage.readFromStorage('mockStore').then((content) => {
+      expect(content).toEqual(mockStore);
     });
-  });
-});
+  })
+})

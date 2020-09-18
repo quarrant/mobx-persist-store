@@ -1,4 +1,5 @@
 import { StorageAdapterOptions } from './types';
+import { JSONParse } from './utils';
 
 export default class StorageAdapter {
   private write: StorageAdapterOptions['write'];
@@ -12,10 +13,9 @@ export default class StorageAdapter {
   writeInStorage<T>(name: string, content: T): Promise<void | Error> {
     return new Promise((resolve, reject) => {
       const contentString = JSON.stringify(content);
-      this.write(name, contentString)
-        .then(() => resolve())
+      this.write(name, contentString).then(resolve)
         .catch((error) => {
-          console.log('StorageAdapter.writeInStorage', error);
+          console.warn(`StorageAdapter.writeInStorage [${name}]`, error);
           reject(error);
         });
     });
@@ -25,14 +25,13 @@ export default class StorageAdapter {
     return new Promise((resolve, reject) => {
       this.read(name)
         .then((content) => {
-          if (content) {
-            const contentObject = JSON.parse(content);
-            return resolve(contentObject);
-          }
-          resolve(undefined);
+          if (!content) return resolve();
+
+          const contentObject = JSONParse<T>(content);
+          return resolve(contentObject);
         })
         .catch((error) => {
-          console.log('StorageAdapter.readFromStorage', error);
+          console.warn(`StorageAdapter.readFromStorage [${name}]`, error);
           reject(error);
         });
     });
