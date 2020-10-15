@@ -30,6 +30,12 @@ function getObservableTargetObject<T extends Object>(target: T, properties: (key
     }
 
     if (target.hasOwnProperty(property)) {
+      let value: T[keyof T] | any[] = target[property]
+
+      if (Array.isArray(value)) {
+        value = value.slice()
+      }
+
       return { ...result, [property]: target[property] };
     }
 
