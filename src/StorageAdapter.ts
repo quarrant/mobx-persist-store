@@ -1,7 +1,7 @@
 import { StorageAdapterOptions } from './types';
 import { JSONParse } from './utils';
 
-export default class StorageAdapter {
+export class StorageAdapter {
   private write: StorageAdapterOptions['write'];
   private read: StorageAdapterOptions['read'];
 

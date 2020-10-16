@@ -1,9 +1,9 @@
 import { IReactionDisposer, observable, action } from 'mobx';
 
-import StorageAdapter from './StorageAdapter';
+import { StorageAdapter } from './StorageAdapter';
 import { PersistenceStore } from './types';
 
-class StorageConfiguration<T> {
+class StorageConfigurationStatic<T> {
   private adapterMap: Map<string, StorageAdapter> = new Map();
   private disposersMap: Map<string, IReactionDisposer[]> = new Map();
   private isSynchronizedMap: Map<string, boolean> = observable.map();
@@ -33,4 +33,4 @@ class StorageConfiguration<T> {
   };
 }
 
-export default new StorageConfiguration();
+export const StorageConfiguration = new StorageConfigurationStatic();

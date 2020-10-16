@@ -1,49 +1,10 @@
-import { IReactionOptions, extendObservable, isComputedProp, reaction, isObservableProp, ObservableMap } from 'mobx';
+import { extendObservable, reaction, ObservableMap } from 'mobx';
 
-import StorageAdapter from './StorageAdapter';
-import StorageConfiguration from './StorageConfiguration';
-import { PersistenceStore } from './types';
+import { StorageConfiguration } from './StorageConfiguration';
+import { PersistenceStore, PersistenceDecoratorOptions } from './types';
+import { getObjectKeys, getObservableTargetObject } from './utils';
 
-type Options = {
-  name: string;
-  properties: string[];
-  adapter: StorageAdapter;
-  reactionOptions?: IReactionOptions;
-};
-
-function getKeys<T>(object: T) {
-  return Object.keys(object) as (keyof T)[];
-}
-
-function getObservableTargetObject<T extends Object>(target: T, properties: (keyof T)[]) {
-  return properties.reduce((result, property) => {
-    const observableProperty = isObservableProp(target, String(property));
-    const computedProperty = isComputedProp(target, String(property));
-
-    if (!observableProperty || computedProperty) {
-      if (computedProperty) {
-        console.warn('The property `' + property + '` is computed and will not persist.');
-        return result;
-      }
-
-      console.warn('The property `' + property + '` is not observable and not affected reaction, but will persist.');
-    }
-
-    if (target.hasOwnProperty(property)) {
-      let value: T[keyof T] | any[] = target[property]
-
-      if (Array.isArray(value)) {
-        value = value.slice()
-      }
-
-      return { ...result, [property]: target[property] };
-    }
-
-    return result;
-  }, {} as T);
-}
-
-export default function persistenceDecorator(options: Options) {
+export function persistenceDecorator(options: PersistenceDecoratorOptions) {
   return function<T extends { new (...args: any): {} }>(target: T) {
     StorageConfiguration.setAdapter(options.name, options.adapter);
 
@@ -68,10 +29,10 @@ export default function persistenceDecorator(options: Options) {
 
     options.adapter.readFromStorage<typeof targetPrototype>(targetPrototype._storageName).then((content) => {
       if (content) {
-        getKeys(content).forEach((property) => {
+        getObjectKeys(content).forEach((property) => {
           if (targetPrototype[property] instanceof ObservableMap) {
             const targetPartial = targetPrototype[property];
-            const mapSource = getKeys(content[property]).reduce<[keyof typeof targetPartial, Record<string, any>][]>(
+            const mapSource = getObjectKeys(content[property]).reduce<[keyof typeof targetPartial, Record<string, any>][]>(
               (p, k) => {
                 p.push([k, content[property][k]]);
                 return p;
