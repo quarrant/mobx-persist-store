@@ -14,11 +14,13 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
     const extendObservableWrapper = mobxNewestVersionSelect(Object.assign, extendObservable);
     const makeAutoObservableWrapper = mobxNewestVersionSelect(makeAutoObservable, (target) => target);
 
-    const observableTargetPrototype = extendObservableWrapper(makeAutoObservableWrapper(targetPrototype), {
+    const observableTargetPrototype = makeAutoObservableWrapper(targetPrototype);
+
+    extendObservableWrapper(observableTargetPrototype, {
       _isPersistence: true,
       _storageName: options.name,
       get _asJS() {
-        return getObservableTargetObject(targetPrototype, properties);
+        return getObservableTargetObject(observableTargetPrototype, properties);
       },
     });
 
@@ -54,6 +56,6 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
         StorageConfiguration.setIsSynchronized(observableTargetPrototype, true);
       });
 
-    return observableTargetPrototype.constructor as PersistenceStore<T>;
+    return target as PersistenceStore<T>;
   };
 }
