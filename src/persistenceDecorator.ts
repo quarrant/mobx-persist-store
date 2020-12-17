@@ -1,4 +1,4 @@
-import { extendObservable, reaction, ObservableMap, makeObservable } from 'mobx';
+import { extendObservable, reaction, ObservableMap, makeAutoObservable } from 'mobx';
 
 import { StorageConfiguration } from './StorageConfiguration';
 import { PersistenceStore, PersistenceDecoratorOptions } from './types';
@@ -12,9 +12,9 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
     const targetPrototype = target.prototype as PersistenceStore<T>;
 
     const extendObservableWrapper = mobxNewestVersionSelect(Object.assign, extendObservable);
-    const makeObservableWrapper = mobxNewestVersionSelect(makeObservable, (target) => target);
+    const makeAutoObservableWrapper = mobxNewestVersionSelect(makeAutoObservable, (target) => target);
 
-    extendObservableWrapper(makeObservableWrapper(targetPrototype), {
+    extendObservableWrapper(makeAutoObservableWrapper(targetPrototype), {
       _isPersistence: true,
       _storageName: options.name,
       get _asJS() {
