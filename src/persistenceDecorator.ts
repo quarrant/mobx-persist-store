@@ -54,6 +54,6 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
         StorageConfiguration.setIsSynchronized(observableTargetPrototype, true);
       });
 
-    return observableTargetPrototype as PersistenceStore<T>;
+    return observableTargetPrototype.constructor as PersistenceStore<T>;
   };
 }
