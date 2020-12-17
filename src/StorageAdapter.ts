@@ -13,7 +13,8 @@ export class StorageAdapter {
   writeInStorage<T>(name: string, content: T): Promise<void | Error> {
     return new Promise((resolve, reject) => {
       const contentString = JSON.stringify(content);
-      this.write(name, contentString).then(resolve)
+      this.write(name, contentString)
+        .then(resolve)
         .catch((error) => {
           console.warn(`StorageAdapter.writeInStorage [${name}]`, error);
           reject(error);
@@ -25,7 +26,7 @@ export class StorageAdapter {
     return new Promise((resolve, reject) => {
       this.read(name)
         .then((content) => {
-          if (!content) return resolve();
+          if (!content) return resolve(undefined);
 
           const contentObject = JSONParse<T>(content);
           return resolve(contentObject);
