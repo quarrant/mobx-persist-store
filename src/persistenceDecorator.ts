@@ -14,7 +14,7 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
     const extendObservableWrapper = mobxNewestVersionSelect(Object.assign, extendObservable);
     const makeAutoObservableWrapper = mobxNewestVersionSelect(makeAutoObservable, (target) => target);
 
-    extendObservableWrapper(makeAutoObservableWrapper(targetPrototype), {
+    const observableTargetPrototype = extendObservableWrapper(makeAutoObservableWrapper(targetPrototype), {
       _isPersistence: true,
       _storageName: options.name,
       get _asJS() {
@@ -23,35 +23,37 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
     });
 
     const disposer = reaction(
-      () => targetPrototype._asJS,
-      (jsObject) => options.adapter.writeInStorage(targetPrototype._storageName, jsObject),
+      () => observableTargetPrototype._asJS,
+      (jsObject) => options.adapter.writeInStorage(observableTargetPrototype._storageName, jsObject),
       options.reactionOptions,
     );
 
-    StorageConfiguration.setDisposers(targetPrototype, [disposer]);
+    StorageConfiguration.setDisposers(observableTargetPrototype, [disposer]);
 
-    options.adapter.readFromStorage<typeof targetPrototype>(targetPrototype._storageName).then((content) => {
-      if (content) {
-        getObjectKeys(content).forEach((property) => {
-          if (targetPrototype[property] instanceof ObservableMap) {
-            const targetPartial = targetPrototype[property];
-            const mapSource = getObjectKeys(content[property]).reduce<
-              [keyof typeof targetPartial, Record<string, any>][]
-            >((p, k) => {
-              p.push([k, content[property][k]]);
-              return p;
-            }, []);
-            const observableMap = new Map(mapSource);
-            targetPrototype[property] = (observableMap as unknown) as typeof targetPartial;
-          } else {
-            targetPrototype[property] = content[property];
-          }
-        });
-      }
+    options.adapter
+      .readFromStorage<typeof observableTargetPrototype>(observableTargetPrototype._storageName)
+      .then((content) => {
+        if (content) {
+          getObjectKeys(content).forEach((property) => {
+            if (observableTargetPrototype[property] instanceof ObservableMap) {
+              const targetPartial = observableTargetPrototype[property];
+              const mapSource = getObjectKeys(content[property]).reduce<
+                [keyof typeof targetPartial, Record<string, any>][]
+              >((p, k) => {
+                p.push([k, content[property][k]]);
+                return p;
+              }, []);
+              const observableMap = new Map(mapSource);
+              observableTargetPrototype[property] = (observableMap as unknown) as typeof targetPartial;
+            } else {
+              observableTargetPrototype[property] = content[property];
+            }
+          });
+        }
 
-      StorageConfiguration.setIsSynchronized(targetPrototype, true);
-    });
+        StorageConfiguration.setIsSynchronized(observableTargetPrototype, true);
+      });
 
-    return target as PersistenceStore<T>;
+    return observableTargetPrototype as PersistenceStore<T>;
   };
 }
