@@ -13,7 +13,6 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
 
     const extendObservableWrapper = mobxNewestVersionSelect(Object.assign, extendObservable);
     const makeAutoObservableWrapper = mobxNewestVersionSelect(makeAutoObservable, (target) => target);
-
     const observableTargetPrototype = makeAutoObservableWrapper(targetPrototype);
 
     extendObservableWrapper(observableTargetPrototype, {
@@ -56,6 +55,6 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
         StorageConfiguration.setIsSynchronized(observableTargetPrototype, true);
       });
 
-    return target as PersistenceStore<T>;
+    return observableTargetPrototype.constructor as PersistenceStore<T>;
   };
 }
