@@ -9,7 +9,10 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
     StorageConfiguration.setAdapter(options.name, options.adapter);
 
     const properties = options.properties as (keyof T)[];
-    const targetPrototype = Object.getPrototypeOf(target) as PersistenceStore<T>;
+    const targetPrototype = mobxNewestVersionSelect(
+      () => target,
+      () => Object.getPrototypeOf(target),
+    )() as PersistenceStore<T>;
 
     const extendObservableWrapper = mobxNewestVersionSelect(Object.assign, extendObservable);
     const observableTargetPrototype = extendObservableWrapper(targetPrototype, {
@@ -22,13 +25,13 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
 
     const disposer = reaction(
       () => targetPrototype._asJS,
-      (jsObject) => options.adapter.writeInStorage(targetPrototype._storageName, jsObject),
+      (jsObject) => options.adapter.writeInStorage(options.name, jsObject),
       options.reactionOptions,
     );
 
     StorageConfiguration.setDisposers(targetPrototype, [disposer]);
 
-    options.adapter.readFromStorage<typeof targetPrototype>(targetPrototype._storageName).then((content) => {
+    options.adapter.readFromStorage<typeof targetPrototype>(options.name).then((content) => {
       if (content) {
         getObjectKeys(content).forEach((property) => {
           if (targetPrototype[property] instanceof ObservableMap) {
