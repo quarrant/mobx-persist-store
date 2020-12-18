@@ -24,7 +24,11 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
     });
 
     const disposer = reaction(
-      () => targetPrototype._asJS,
+      mobxNewestVersionSelect(
+        () => getObservableTargetObject(targetPrototype, properties),
+        // @ts-ignore
+        () => targetPrototype._asJS,
+      ),
       (jsObject) => options.adapter.writeInStorage(options.name, jsObject),
       options.reactionOptions,
     );
