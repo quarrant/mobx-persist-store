@@ -126,3 +126,49 @@ persistence({
 
 export default new CounterStore();
 ```
+
+## With Mobx 6
+
+```javascript
+import { makeAutoObservable } from 'mobx';
+import { persistence, useClear, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
+
+function readStore(name) {
+  return new Promise((resolve) => {
+    const data = localStorage.getItem(name);
+    resolve(JSON.parse(data));
+  });
+}
+
+function writeStore(name, content) {
+  return new Promise((resolve) => {
+    localStorage.setItem(name, JSON.stringify(content));
+    resolve();
+  });
+}
+
+class CounterStore {
+  counter: number = 0;
+
+  tickCounter = () => {
+    this.counter = this.counter + 1;
+  };
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+}
+
+export default persistence({
+  name: 'CounterStore',
+  properties: ['counter'],
+  adapter: new StorageAdapter({
+    read: readStore,
+    write: writeStore,
+  }),
+  reactionOptions: {
+    // optional
+    delay: 2000,
+  },
+})(new CounterStore());
+```
