@@ -11,7 +11,8 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
     const properties = options.properties as (keyof T)[];
     const targetPrototype = mobxNewestVersionSelect(
       () => target,
-      () => Object.getPrototypeOf(target),
+      // @ts-ignore
+      () => target.prototype,
     )() as PersistenceStore<T>;
 
     const extendObservableWrapper = mobxNewestVersionSelect(Object.assign, extendObservable);
