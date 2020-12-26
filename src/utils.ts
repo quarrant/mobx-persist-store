@@ -36,10 +36,13 @@ export function getObservableTargetObject<T extends Object>(target: T, propertie
     }
 
     if (target.hasOwnProperty(property)) {
-      let value: T[keyof T] | any[] = target[property];
+      let value: T[keyof T] | string = target[property];
 
-      if (Array.isArray(value)) {
-        value = value.slice();
+      /**
+       * This makes objects recursively observable for mutable changes
+       */
+      if (typeof value === 'object') {
+        value = JSON.stringify(value)
       }
 
       return { ...result, [property]: target[property] };
