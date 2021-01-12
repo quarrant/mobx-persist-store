@@ -1,4 +1,4 @@
-import { extendObservable, reaction, ObservableMap, makeAutoObservable } from 'mobx';
+import { extendObservable, reaction, ObservableMap, action } from 'mobx';
 
 import { StorageConfiguration } from './StorageConfiguration';
 import { PersistenceStore, PersistenceDecoratorOptions } from './types';
@@ -36,7 +36,7 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
 
     StorageConfiguration.setDisposers(targetPrototype, [disposer]);
 
-    options.adapter.readFromStorage<typeof targetPrototype>(options.name).then((content) => {
+    options.adapter.readFromStorage<typeof targetPrototype>(options.name).then(action((content: PersistenceStore<T> | undefined) => {
       if (content) {
         getObjectKeys(content).forEach((property) => {
           if (targetPrototype[property] instanceof ObservableMap) {
@@ -56,7 +56,7 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
       }
 
       StorageConfiguration.setIsSynchronized(targetPrototype, true);
-    });
+    }));
 
     return mobxNewestVersionSelect(
       () => observableTargetPrototype,
