@@ -26,7 +26,7 @@
     "prepublishOnly": "yarn build"
   },
   "peerDependencies": {
-    "mobx": "^5.14.0"
+    "mobx": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
