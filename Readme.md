@@ -14,7 +14,7 @@ Use the StorageAdapter to connect to your library from cache. It can be anything
 
 ```javascript
 import { action, observable, computed } from 'mobx';
-import { persistence, useClear, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
+import { persistence, clearPersist, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {
   return new Promise((resolve) => {
@@ -38,7 +38,7 @@ function writeStore(name, content) {
     write: writeStore,
   }),
   reactionOptions: { // optional
-    delay: 2000
+    delay: 200
   },
 })
 class CounterStore {
@@ -49,7 +49,7 @@ class CounterStore {
   };
 
   @action clearStore = () => {
-    useClear(this)
+    clearPersist(this)
   }
 
   @action persistDispose = () => {
@@ -68,7 +68,7 @@ export default new CounterStore();
 
 ```javascript
 import { action, observable, computed, decorate } from 'mobx';
-import { persistence, useClear, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
+import { persistence, clearPersist, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {
   return new Promise((resolve) => {
@@ -92,7 +92,7 @@ class CounterStore {
   };
 
   clearStore = () => {
-    useClear(this)
+    clearPersist(this)
   }
 
   persistDespose = () => {
@@ -120,7 +120,7 @@ persistence({
     write: writeStore,
   }),
   reactionOptions: { // optional
-    delay: 2000
+    delay: 200
   },
 })(CounterStore);
 
@@ -131,7 +131,7 @@ export default new CounterStore();
 
 ```javascript
 import { makeAutoObservable } from 'mobx';
-import { persistence, useClear, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
+import { persistence, clearPersist, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {
   return new Promise((resolve) => {
@@ -168,7 +168,7 @@ export default persistence({
   }),
   reactionOptions: {
     // optional
-    delay: 2000,
+    delay: 200,
   },
 })(new CounterStore());
 ```
