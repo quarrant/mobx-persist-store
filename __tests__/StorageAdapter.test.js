@@ -1,4 +1,4 @@
-const {StorageAdapter} = require('../src/StorageAdapter');
+const { StorageAdapter } = require('../src/StorageAdapter');
 
 const testStorage = {
   testRead: JSON.stringify({ test: 'testContent' }),

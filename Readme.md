@@ -25,7 +25,7 @@ function readStore(name) {
 
 function writeStore(name, content) {
   return new Promise((resolve) => {
-    localStorage.setItem(name, JSON.stringify(content));
+    localStorage.setItem(name, content);
     resolve();
   });
 }
@@ -79,7 +79,7 @@ function readStore(name) {
 
 function writeStore(name, content) {
   return new Promise((resolve) => {
-    localStorage.setItem(name, JSON.stringify(content));
+    localStorage.setItem(name, content);
     resolve();
   });
 }
@@ -142,7 +142,7 @@ function readStore(name) {
 
 function writeStore(name, content) {
   return new Promise((resolve) => {
-    localStorage.setItem(name, JSON.stringify(content));
+    localStorage.setItem(name, content);
     resolve();
   });
 }
