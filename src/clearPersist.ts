@@ -1,7 +1,7 @@
 import { StorageConfiguration } from './StorageConfiguration';
 import { isPersistence } from './isPersistence';
 
-export function useClear<T extends Object>(target: T) {
+export function clearPersist<T extends Object>(target: T) {
   if (isPersistence(target)) {
     const storageAdapter = StorageConfiguration.getAdapter(target);
     if (storageAdapter) {
