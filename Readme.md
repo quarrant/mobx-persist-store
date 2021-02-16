@@ -14,7 +14,7 @@ Use the StorageAdapter to connect to your library from cache. It can be anything
 
 ```javascript
 import { action, observable, computed } from 'mobx';
-import { persistence, clearPersist, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
+import { persistence, clearPersist, stopPersist, isSynchronized, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {
   return new Promise((resolve) => {
@@ -52,8 +52,8 @@ class CounterStore {
     clearPersist(this)
   }
 
-  @action persistDispose = () => {
-    useDisposers(this)
+  @action stopPersist = () => {
+    stopPersist(this)
   }
 
   @computed get isSynchronized() => {
@@ -68,7 +68,7 @@ export default new CounterStore();
 
 ```javascript
 import { action, observable, computed, decorate } from 'mobx';
-import { persistence, clearPersist, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
+import { persistence, clearPersist, stopPersist, isSynchronized, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {
   return new Promise((resolve) => {
@@ -95,8 +95,8 @@ class CounterStore {
     clearPersist(this)
   }
 
-  persistDespose = () => {
-    useDisposers(this)
+  stopPersist = () => {
+    stopPersist(this)
   }
 
   get isSynchronized() => {
@@ -131,7 +131,7 @@ export default new CounterStore();
 
 ```javascript
 import { makeAutoObservable } from 'mobx';
-import { persistence, clearPersist, useDisposers, isSynchronized, StorageAdapter } from 'mobx-persist-store';
+import { persistence, clearPersist, stopPersist, isSynchronized, StorageAdapter } from 'mobx-persist-store';
 
 function readStore(name) {
   return new Promise((resolve) => {
