@@ -19,7 +19,7 @@ import { persistence, clearPersist, stopPersist, isSynchronized, StorageAdapter 
 function readStore(name) {
   return new Promise((resolve) => {
     const data = localStorage.getItem(name);
-    resolve(JSON.parse(data));
+    resolve(data);
   });
 }
 
@@ -73,7 +73,7 @@ import { persistence, clearPersist, stopPersist, isSynchronized, StorageAdapter 
 function readStore(name) {
   return new Promise((resolve) => {
     const data = localStorage.getItem(name);
-    resolve(JSON.parse(data));
+    resolve(data);
   });
 }
 
@@ -136,7 +136,7 @@ import { persistence, clearPersist, stopPersist, isSynchronized, StorageAdapter 
 function readStore(name) {
   return new Promise((resolve) => {
     const data = localStorage.getItem(name);
-    resolve(JSON.parse(data));
+    resolve(data);
   });
 }
 
