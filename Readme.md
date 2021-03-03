@@ -70,7 +70,7 @@ function writeStore(name, content) {
   },
 })
 class CounterStore {
-  @observable counter: number = 0;
+  @observable counter = 0;
 
   @action tickCounter = () => {
     this.counter = this.counter + 1;
@@ -113,7 +113,7 @@ function writeStore(name, content) {
 }
 
 class CounterStore {
-  counter: number = 0;
+  counter = 0;
 
   tickCounter = () => {
     this.counter = this.counter + 1;
@@ -176,7 +176,7 @@ function writeStore(name, content) {
 }
 
 class CounterStore {
-  counter: number = 0;
+  counter = 0;
 
   tickCounter = () => {
     this.counter = this.counter + 1;
@@ -205,11 +205,9 @@ export default persistence({
 
 https://github.com/quarrant/mobx-persist-store/issues/6
 
-> **persistence**
->
-> `persistence` creates a reaction to changes in observable properties.
+> **persistence** creates a reaction to changes in observable properties.
 > 
-> reactionOptions
+> reactionOptions TODO
 >
 > ```javascript
 > import { persistence } from 'mobx-persist-store';
@@ -227,9 +225,7 @@ https://github.com/quarrant/mobx-persist-store/issues/6
 > })(new CounterStore());
 > ```
 
-> **StorageAdapter**
->
->  `StorageAdapter` read/write any changes through your functions.
+> **StorageAdapter** read/write any changes through your functions.
 >
 > ```javascript
 > import { StorageAdapter } from 'mobx-persist-store';
@@ -248,20 +244,14 @@ https://github.com/quarrant/mobx-persist-store/issues/6
 > })
 > ```
 
-> **clearPersist**
->
->  `clearPersist` remove all cache from store.
+> **clearPersist** remove all cache from store.
 >
 > ```javascript
 > import { clearPersist } from 'mobx-persist-store';
 > 
 > class CounterStore {
->   counter: number = 0;
->
->   tickCounter = () => {
->     this.counter = this.counter + 1;
->   };
->
+>   counter = 0;
+>   ...
 >   clearStore = () => {
 >     clearPersist(this)
 >   }
@@ -276,12 +266,8 @@ https://github.com/quarrant/mobx-persist-store/issues/6
 > import { stopPersist } from 'mobx-persist-store';
 > 
 > class CounterStore {
->   counter: number = 0;
->
->   tickCounter = () => {
->     this.counter = this.counter + 1;
->   };
->
+>   counter = 0;
+>   ...
 >   stopPersist = () => {
 >     stopPersist(this)
 >   }
@@ -296,23 +282,12 @@ https://github.com/quarrant/mobx-persist-store/issues/6
 > import { isSynchronized } from 'mobx-persist-store';
 > 
 > class CounterStore {
->   counter: number = 0;
->
->   tickCounter = () => {
->     this.counter = this.counter + 1;
->   };
->
+>   counter = 0;
+>   ...
 >   get isSynchronized() {
 >     return isSynchronized(this)
 >   }
 > }
-> ```
-
-> **reactionOptions**
->
->  `reactionOptions` todo
->
-> ```ts
 > ```
 
 ## Links
