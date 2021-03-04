@@ -244,8 +244,6 @@ export default persistence({
 >   },
 >   write: async (name, content) => {
 >     window.localStorage.setItem(name, JSON.stringify(content));
->
->     return undefined;
 >   },
 > })
 > ```
