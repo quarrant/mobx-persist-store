@@ -209,13 +209,12 @@ export default persistence({
 ## API
 
 > **persistence** creates a reaction to changes in observable properties. 
->  - `name` must be a unique identifier and will be available within the read/write functions of the StorageAdapter.
->  - `properties` is a list of observable properties in the store you want to persist.
+>  - `name` should be a unique identifier and will be available within the read/write functions of the StorageAdapter.
+>  - `properties` is a list of observable properties on the store you want to persist.
 >  - `adapter` facilitates the reading and writing of the persisted store data.
->  - `reactionOptions` TODO
+>  - `reactionOptions` is an optional property that allows you to set a `delay` option to limit the amount of times the `write` function is called.
+>     -  For example if you have a `200` millisecond delay and two changes happen within the delay time then the `write` function is only called once. If you have no delay then the `write` function would be called twice.
 > 
-> reactionOptions TODO
->
 > ```javascript
 > import { persistence } from 'mobx-persist-store';
 > 
@@ -232,7 +231,7 @@ export default persistence({
 > })(new CounterStore());
 > ```
 
-> **StorageAdapter** will handle hydrating the store with the local cache when the store is first loaded. It will also call the write function for any of the properties that changed in the store you listed in `properties` array.
+> **StorageAdapter** will handle hydrating the store with the cache data when the store is first loaded. The write function is called any time a property in the `properties` array changes.
 >
 > ```javascript
 > import { StorageAdapter } from 'mobx-persist-store';
@@ -279,9 +278,7 @@ export default persistence({
 > }
 > ```
 
-> **isSynchronized**
->
->  `isSynchronized` indicates whether the store has been restored after reading the cache asynchronous.
+> **isSynchronized** indicates whether the store has been restored after reading the cache asynchronous.
 >
 > ```javascript
 > import { isSynchronized } from 'mobx-persist-store';
