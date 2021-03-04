@@ -208,6 +208,8 @@ export default persistence({
 
 ## API
 
+#### persistence
+
 > **persistence** creates a reaction to changes in observable properties. 
 >  - `name` should be a unique identifier and will be available within the read/write functions of the StorageAdapter.
 >  - `properties` is a list of observable properties on the store you want to persist.
@@ -231,6 +233,8 @@ export default persistence({
 > })(new CounterStore());
 > ```
 
+#### StorageAdapter
+
 > **StorageAdapter** will handle hydrating the store with the cache data when the store is first loaded. The write function is called any time a property in the `properties` array changes.
 >
 > ```javascript
@@ -248,6 +252,8 @@ export default persistence({
 > })
 > ```
 
+#### clearPersist
+
 > **clearPersist** removes all the data that was saved from the store. The `write` function on the StorageAdapter is called with an empty object `{}`.
 >
 > ```javascript
@@ -262,6 +268,8 @@ export default persistence({
 > }
 > ```
 
+#### stopPersist
+
 > **stopPersist**  stops saving any changes from the store.
 >
 > ```javascript
@@ -275,6 +283,8 @@ export default persistence({
 >   }
 > }
 > ```
+
+#### isSynchronized
 
 > **isSynchronized** indicates whether the store has been restored after reading the cache asynchronous.
 >
