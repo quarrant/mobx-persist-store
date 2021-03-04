@@ -1,21 +1,25 @@
 
 <h1 align="center">Mobx Persist Store</h1>
 <h4 align="center">A simple way to persist and rehydrate observable properties in mobx stores</h4>
+<div align="center">
+	<a href="https://yarn.pm/mobx-persist-store"><img
+		alt="npm version"
+		src="https://img.shields.io/npm/v/mobx-persist-store.svg?colorA=333a41&maxAge=3600"></a>
+	<a href="https://npm-stat.com/charts.html?package=mobx-persist-store&from=2016-02-12"><img
+		alt="Total downloads on npm"
+		src="https://img.shields.io/npm/dm/mobx-persist-store.svg?colorA=333a41&colorB=007dc7&maxAge=3600&label=Downloads"></a>
+</div>
 <div align="center">:star: Star us on GitHub — it helps!</div>
-
-[![npm version](https://img.shields.io/npm/v/mobx-persist-store.svg?style=flat-square)](https://www.npmjs.com/package/mobx-persist-store)
-[![npm downloads](https://img.shields.io/npm/dm/mobx-persist-store.svg?style=flat-square)](https://www.npmjs.com/package/mobx-persist-store)
 
 ## Table of content
 
 - [Installation](#installation)
 - [Demo](#demo)
 - [Usage](#usage)
-    - [With decorators](#with-decorators)
-    - [Without decorators](#without-decorators)
+    - [With Decorators](#with-decorators)
+    - [Without Decorators](#without-decorators)
     - [With Mobx 6](#with-mobx-6)
 - [API](#api)
-- [License](#license)
 - [Links](#links)
 
 ## Installation
@@ -30,15 +34,16 @@ npm i mobx-persist-store
 
 ## Demo
 
-[Mobx Persist Store with MobX 6](https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark)
-[![gif image created with licecap](./demo-screen-shot.png)](https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark)
+
+<a href="https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark" target="_blank">Mobx Persist Store with MobX 6</a>
+<a href="https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark" target="_blank">![demo screen shot](./demo-screen-shot.png)</a>
 
 
 ## Usage
 
 Use the **StorageAdapter** to connect to your library from cache. It can be anything that is able to read and write data. For **ReactNative** it may be `AsyncStorage`, `FS`, etc. and for **React** - `localStorage`, `sessionStorage`, etc.
 
-### With decorators
+### With Decorators
 
 ```javascript
 import { action, observable, computed } from 'mobx';
@@ -92,7 +97,7 @@ class CounterStore {
 export default new CounterStore();
 ```
 
-### Without decorators
+### Without Decorators
 
 ```javascript
 import { action, observable, computed, decorate } from 'mobx';
@@ -203,9 +208,11 @@ export default persistence({
 
 ## API
 
-https://github.com/quarrant/mobx-persist-store/issues/6
-
-> **persistence** creates a reaction to changes in observable properties.
+> **persistence** creates a reaction to changes in observable properties. 
+>  - `name` must be a unique identifier and will be available within the read/write functions of the StorageAdapter.
+>  - `properties` is a list of observable properties in the store you want to persist.
+>  - `adapter` facilitates the reading and writing of the persisted store data.
+>  - `reactionOptions` TODO
 > 
 > reactionOptions TODO
 >
@@ -225,7 +232,7 @@ https://github.com/quarrant/mobx-persist-store/issues/6
 > })(new CounterStore());
 > ```
 
-> **StorageAdapter** read/write any changes through your functions.
+> **StorageAdapter** will handle hydrating the store with the local cache when the store is first loaded. It will also call the write function for any of the properties that changed in the store you listed in `properties` array.
 >
 > ```javascript
 > import { StorageAdapter } from 'mobx-persist-store';
@@ -244,7 +251,7 @@ https://github.com/quarrant/mobx-persist-store/issues/6
 > })
 > ```
 
-> **clearPersist** remove all cache from store.
+> **clearPersist** removes all the data that was saved from the store. The `write` function on the StorageAdapter is called with an empty object `{}`.
 >
 > ```javascript
 > import { clearPersist } from 'mobx-persist-store';
@@ -258,9 +265,7 @@ https://github.com/quarrant/mobx-persist-store/issues/6
 > }
 > ```
 
-> **stopPersist**
->
->  `stopPersist` stop persistence for store.
+> **stopPersist**  stops saving any changes from the store.
 >
 > ```javascript
 > import { stopPersist } from 'mobx-persist-store';
@@ -276,7 +281,7 @@ https://github.com/quarrant/mobx-persist-store/issues/6
 
 > **isSynchronized**
 >
->  `isSynchronized` indicates whether the storage is restored since cache reading is asynchronous.
+>  `isSynchronized` indicates whether the store has been restored after reading the cache asynchronous.
 >
 > ```javascript
 > import { isSynchronized } from 'mobx-persist-store';
