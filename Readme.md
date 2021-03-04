@@ -16,10 +16,15 @@
 - [Installation](#installation)
 - [Demo](#demo)
 - [Usage](#usage)
-    - [With Decorators](#with-decorators)
-    - [Without Decorators](#without-decorators)
-    - [With Mobx 6](#with-mobx-6)
+  - [With Decorators](#with-decorators)
+  - [Without Decorators](#without-decorators)
+  - [With Mobx 6](#with-mobx-6)
 - [API](#api)
+  - [persistence](#persistence)
+  - [StorageAdapter](#storageadapter)
+  - [clearPersist](#clearpersist)
+  - [stopPersist](#stoppersist)
+  - [isSynchronized](#issynchronized)
 - [Links](#links)
 
 ## Installation
@@ -210,16 +215,16 @@ export default persistence({
 
 #### persistence
 
-> **persistence** creates a reaction to changes in observable properties. 
+> **persistence** creates a reaction to changes in observable properties.
 >  - `name` should be a unique identifier and will be available within the read/write functions of the StorageAdapter.
 >  - `properties` is a list of observable properties on the store you want to persist.
 >  - `adapter` facilitates the reading and writing of the persisted store data.
 >  - `reactionOptions` is an optional property that allows you to set a `delay` option to limit the amount of times the `write` function is called.
->     -  For example if you have a `200` millisecond delay and two changes happen within the delay time then the `write` function is only called once. If you have no delay then the `write` function would be called twice.
-> 
+     >     -  For example if you have a `200` millisecond delay and two changes happen within the delay time then the `write` function is only called once. If you have no delay then the `write` function would be called twice.
+>
 > ```javascript
 > import { persistence } from 'mobx-persist-store';
-> 
+>
 > export default persistence({
 >    name: 'CounterStore',
 >    properties: ['counter'],
@@ -239,7 +244,7 @@ export default persistence({
 >
 > ```javascript
 > import { StorageAdapter } from 'mobx-persist-store';
-> 
+>
 > new StorageAdapter({
 >   read: async (name) => {
 >     const data = window.localStorage.getItem(name);
@@ -258,7 +263,7 @@ export default persistence({
 >
 > ```javascript
 > import { clearPersist } from 'mobx-persist-store';
-> 
+>
 > class CounterStore {
 >   counter = 0;
 >   ...
@@ -274,7 +279,7 @@ export default persistence({
 >
 > ```javascript
 > import { stopPersist } from 'mobx-persist-store';
-> 
+>
 > class CounterStore {
 >   counter = 0;
 >   ...
@@ -290,7 +295,7 @@ export default persistence({
 >
 > ```javascript
 > import { isSynchronized } from 'mobx-persist-store';
-> 
+>
 > class CounterStore {
 >   counter = 0;
 >   ...
