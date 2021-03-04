@@ -22,7 +22,7 @@ export class StorageAdapter {
     });
   }
 
-  readFromStorage<T>(name: string): Promise<T | undefined> {
+  readFromStorage<T>(name: string): Promise<T | void> {
     return new Promise((resolve, reject) => {
       this.read(name)
         .then((content) => {
