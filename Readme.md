@@ -220,7 +220,7 @@ export default persistence({
 >  - `properties` is a list of observable properties on the store you want to persist.
 >  - `adapter` facilitates the reading and writing of the persisted store data.
 >  - `reactionOptions` is an optional property that allows you to set a `delay` option to limit the amount of times the `write` function is called.
-     >     -  For example if you have a `200` millisecond delay and two changes happen within the delay time then the `write` function is only called once. If you have no delay then the `write` function would be called twice.
+>     -  For example if you have a `200` millisecond delay and two changes happen within the delay time then the `write` function is only called once. If you have no delay then the `write` function would be called twice.
 >
 > ```javascript
 > import { persistence } from 'mobx-persist-store';
