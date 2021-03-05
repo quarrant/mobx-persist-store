@@ -13,3 +13,5 @@ git add package*.json
 
 git commit -m "release-$VERSION"
 git push -u origin release-$VERSION
+
+git checkout master
