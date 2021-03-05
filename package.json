@@ -1,6 +1,6 @@
 {
   "name": "mobx-persist-store",
-  "version": "0.5.27",
+  "version": "0.5.28",
   "description": "Mobx Persist Store",
   "author": "quarrant",
   "license": "MIT",
@@ -24,7 +24,7 @@
     "test": "jest",
     "build": "rm -rf lib && tsc",
     "prepublishOnly": "yarn build",
-    "release-branch": "git checkout -b release-$(npm version patch)"
+    "release-branch": "bash scripts/make-release-branch.sh"
   },
   "peerDependencies": {
     "mobx": "*"
