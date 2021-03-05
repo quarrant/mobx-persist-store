@@ -12,4 +12,4 @@ git checkout -b release-$VERSION
 git add package*.json
 
 git commit -m "release-$VERSION"
-git push
+git push -u origin release-$VERSION
