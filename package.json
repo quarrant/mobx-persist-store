@@ -23,7 +23,8 @@
   "scripts": {
     "test": "jest",
     "build": "rm -rf lib && tsc",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "release-branch": "git checkout -b release-$(npm version patch)"
   },
   "peerDependencies": {
     "mobx": "*"
