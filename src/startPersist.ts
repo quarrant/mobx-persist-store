@@ -1,10 +1,12 @@
 import { StorageConfiguration } from './StorageConfiguration';
 import { isPersistence } from './isPersistence';
 
-export function stopPersist<T extends Object>(target: T) {
+export function startPersist<T extends Object>(target: T) {
   if (isPersistence(target)) {
     const disposers = StorageConfiguration.getDisposers(target);
-    disposers.forEach((disposers) => disposers());
-    StorageConfiguration.clearDisposers(target);
+    if (disposers.length) {
+      const startPersistFunction = StorageConfiguration.getStartPersist(target);
+      startPersistFunction?.();
+    }
   }
 }

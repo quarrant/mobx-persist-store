@@ -10,8 +10,11 @@ export type PersistenceDecoratorOptions = {
   reactionOptions?: IReactionOptions;
 };
 
+export type PersistenceCreatorReturnFunction = <T extends { new (...args: any): {} } | Object>(
+  target: T,
+) => PersistenceStore<T>;
+
 export type StorageAdapterOptions = {
   write: (name: string, value: string) => Promise<Error | void>;
   read: (name: string) => Promise<string | undefined>;
 };
-

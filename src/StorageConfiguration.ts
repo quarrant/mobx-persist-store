@@ -1,12 +1,14 @@
 import { IReactionDisposer, observable, action } from 'mobx';
 
 import { StorageAdapter } from './StorageAdapter';
-import { PersistenceStore } from './types';
+import { PersistenceCreatorReturnFunction, PersistenceStore } from './types';
 
 class StorageConfigurationStatic<T> {
   private adapterMap: Map<string, StorageAdapter> = new Map();
   private disposersMap: Map<string, IReactionDisposer[]> = new Map();
   private isSynchronizedMap: Map<string, boolean> = observable.map();
+
+  private startPersistMap: Map<string, () => PersistenceCreatorReturnFunction> = new Map();
 
   setAdapter = (storageName: string, adapter: StorageAdapter) => {
     this.adapterMap.set(storageName, adapter);
@@ -14,6 +16,10 @@ class StorageConfigurationStatic<T> {
 
   setDisposers = (target: PersistenceStore<T>, disposers: IReactionDisposer[]) => {
     this.disposersMap.set(target._storageName, disposers);
+  };
+
+  setStartPersist = (storageName: string, startPersist: () => PersistenceCreatorReturnFunction) => {
+    this.startPersistMap.set(storageName, startPersist);
   };
 
   @action setIsSynchronized = (target: PersistenceStore<T>, isSynchronized: boolean) => {
@@ -30,6 +36,14 @@ class StorageConfigurationStatic<T> {
 
   getIsSynchronized = (target: PersistenceStore<T>) => {
     return this.isSynchronizedMap.get(target._storageName) || false;
+  };
+
+  getStartPersist = (target: PersistenceStore<T>) => {
+    return this.startPersistMap.get(target._storageName);
+  };
+
+  clearDisposers = (target: PersistenceStore<T>) => {
+    return this.disposersMap.delete(target._storageName);
   };
 }
 
