@@ -1,19 +1,29 @@
 import { extendObservable, reaction, ObservableMap, action } from 'mobx';
 
 import { StorageConfiguration } from './StorageConfiguration';
-import { PersistenceStore, PersistenceDecoratorOptions } from './types';
+import { PersistenceStore, PersistenceDecoratorOptions, PersistenceCreatorReturnFunction } from './types';
 import { getObjectKeys, getObservableTargetObject, mobxNewestVersionSelect } from './utils';
 
+function getTargetPrototype<T>(target: T) {
+  return mobxNewestVersionSelect(
+    () => target,
+    // @ts-ignore
+    () => target.prototype,
+  )() as PersistenceStore<T>;
+}
+
 export function persistenceDecorator(options: PersistenceDecoratorOptions) {
-  return function <T extends { new (...args: any): {} } | Object>(target: T) {
+  const persistenceCreator = (
+    options: PersistenceDecoratorOptions,
+    skipSynchronization?: boolean,
+  ): PersistenceCreatorReturnFunction => (target) => {
     StorageConfiguration.setAdapter(options.name, options.adapter);
 
-    const properties = options.properties as (keyof T)[];
-    const targetPrototype = mobxNewestVersionSelect(
-      () => target,
-      // @ts-ignore
-      () => target.prototype,
-    )() as PersistenceStore<T>;
+    const targetPrototype = getTargetPrototype(target);
+
+    type TargetGenericType = typeof targetPrototype;
+
+    const properties = options.properties as (keyof TargetGenericType)[];
 
     const extendObservableWrapper = mobxNewestVersionSelect(Object.assign, extendObservable);
     const observableTargetPrototype = extendObservableWrapper(targetPrototype, {
@@ -36,31 +46,39 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
 
     StorageConfiguration.setDisposers(targetPrototype, [disposer]);
 
-    options.adapter.readFromStorage<typeof targetPrototype>(options.name).then(action((content: PersistenceStore<T> | undefined) => {
-      if (content) {
-        getObjectKeys(content).forEach((property) => {
-          if (targetPrototype[property] instanceof ObservableMap) {
-            const targetPartial = targetPrototype[property];
-            const mapSource = getObjectKeys(content[property]).reduce<
-              [keyof typeof targetPartial, Record<string, any>][]
-            >((p, k) => {
-              p.push([k, content[property][k]]);
-              return p;
-            }, []);
-            const observableMap = new Map(mapSource);
-            targetPrototype[property] = (observableMap as unknown) as typeof targetPartial;
-          } else {
-            targetPrototype[property] = content[property];
+    if (!skipSynchronization) {
+      options.adapter.readFromStorage<TargetGenericType>(options.name).then(
+        action((content: TargetGenericType | undefined) => {
+          if (content) {
+            getObjectKeys(content).forEach((property) => {
+              if (targetPrototype[property] instanceof ObservableMap) {
+                const targetPartial = targetPrototype[property];
+                const mapSource = getObjectKeys(content[property]).reduce<
+                  [keyof typeof targetPartial, Record<string, any>][]
+                >((p, k) => {
+                  p.push([k, content[property][k]]);
+                  return p;
+                }, []);
+                const observableMap = new Map(mapSource);
+                targetPrototype[property] = (observableMap as unknown) as typeof targetPartial;
+              } else {
+                targetPrototype[property] = content[property];
+              }
+            });
           }
-        });
-      }
 
-      StorageConfiguration.setIsSynchronized(targetPrototype, true);
-    }));
+          StorageConfiguration.setIsSynchronized(targetPrototype, true);
+        }),
+      );
+    }
 
     return mobxNewestVersionSelect(
       () => observableTargetPrototype,
       () => target,
-    )() as PersistenceStore<T>;
+    )() as TargetGenericType;
   };
+
+  StorageConfiguration.setStartPersist(options.name, () => persistenceCreator(options, true));
+
+  return persistenceCreator(options);
 }
