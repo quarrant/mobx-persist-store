@@ -24,6 +24,7 @@
   - [StorageAdapter](#storageadapter)
   - [clearPersist](#clearpersist)
   - [stopPersist](#stoppersist)
+  - [startPersist](#startpersist)
   - [isSynchronized](#issynchronized)
 - [Links](#links)
 
@@ -285,6 +286,22 @@ export default persistence({
 >   ...
 >   stopPersist = () => {
 >     stopPersist(this)
+>   }
+> }
+> ```
+
+#### startPersist
+
+> **startPersist**  restarts saving any changes from the store if you previously called `stopPersist`
+>
+> ```javascript
+> import { startPersist } from 'mobx-persist-store';
+>
+> class CounterStore {
+>   counter = 0;
+>   ...
+>   startPersist = () => {
+>     startPersist(this)
 >   }
 > }
 > ```
