@@ -6,7 +6,7 @@ export function startPersist<T extends Object>(target: T) {
     const disposers = StorageConfiguration.getDisposers(target);
     if (!disposers.length) {
       const startPersistFunction = StorageConfiguration.getStartPersist(target);
-      startPersistFunction?.();
+      startPersistFunction?.()(target);
     }
   }
 }
