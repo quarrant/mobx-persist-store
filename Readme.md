@@ -292,7 +292,7 @@ export default persistence({
 
 #### startPersist
 
-> **startPersist**  restart saving any changes from the store if you previously called `stopPersist`
+> **startPersist**  restarts saving any changes from the store if you previously called `stopPersist`
 >
 > ```javascript
 > import { startPersist } from 'mobx-persist-store';
