@@ -13,7 +13,10 @@ function getTargetPrototype<T>(target: T) {
 }
 
 export function persistenceDecorator(options: PersistenceDecoratorOptions) {
-  const persistenceCreator = (options: PersistenceDecoratorOptions): PersistenceCreatorReturnFunction => (target) => {
+  const persistenceCreator = (
+    options: PersistenceDecoratorOptions,
+    skipSynchronization?: boolean,
+  ): PersistenceCreatorReturnFunction => (target) => {
     StorageConfiguration.setAdapter(options.name, options.adapter);
 
     const targetPrototype = getTargetPrototype(target);
@@ -43,29 +46,31 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
 
     StorageConfiguration.setDisposers(targetPrototype, [disposer]);
 
-    options.adapter.readFromStorage<TargetGenericType>(options.name).then(
-      action((content: TargetGenericType | undefined) => {
-        if (content) {
-          getObjectKeys(content).forEach((property) => {
-            if (targetPrototype[property] instanceof ObservableMap) {
-              const targetPartial = targetPrototype[property];
-              const mapSource = getObjectKeys(content[property]).reduce<
-                [keyof typeof targetPartial, Record<string, any>][]
-              >((p, k) => {
-                p.push([k, content[property][k]]);
-                return p;
-              }, []);
-              const observableMap = new Map(mapSource);
-              targetPrototype[property] = (observableMap as unknown) as typeof targetPartial;
-            } else {
-              targetPrototype[property] = content[property];
-            }
-          });
-        }
+    if (!skipSynchronization) {
+      options.adapter.readFromStorage<TargetGenericType>(options.name).then(
+        action((content: TargetGenericType | undefined) => {
+          if (content) {
+            getObjectKeys(content).forEach((property) => {
+              if (targetPrototype[property] instanceof ObservableMap) {
+                const targetPartial = targetPrototype[property];
+                const mapSource = getObjectKeys(content[property]).reduce<
+                  [keyof typeof targetPartial, Record<string, any>][]
+                >((p, k) => {
+                  p.push([k, content[property][k]]);
+                  return p;
+                }, []);
+                const observableMap = new Map(mapSource);
+                targetPrototype[property] = (observableMap as unknown) as typeof targetPartial;
+              } else {
+                targetPrototype[property] = content[property];
+              }
+            });
+          }
 
-        StorageConfiguration.setIsSynchronized(targetPrototype, true);
-      }),
-    );
+          StorageConfiguration.setIsSynchronized(targetPrototype, true);
+        }),
+      );
+    }
 
     return mobxNewestVersionSelect(
       () => observableTargetPrototype,
@@ -73,7 +78,7 @@ export function persistenceDecorator(options: PersistenceDecoratorOptions) {
     )() as TargetGenericType;
   };
 
-  StorageConfiguration.setStartPersist(options.name, () => persistenceCreator(options));
+  StorageConfiguration.setStartPersist(options.name, () => persistenceCreator(options, true));
 
   return persistenceCreator(options);
 }
