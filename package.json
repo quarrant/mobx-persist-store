@@ -24,7 +24,7 @@
     "test": "jest",
     "build": "rm -rf lib && tsc",
     "prepublishOnly": "yarn build",
-    "release-branch": "bash scripts/make-release-branch.sh"
+    "npm:release": "bash scripts/make-release-branch.sh"
   },
   "peerDependencies": {
     "mobx": "*"
