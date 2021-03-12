@@ -1,8 +1,8 @@
 name: npm-publish
 
 on:
-  release:
-    types: [published]
+  pull_request:
+    types: [closed]
 
 jobs:
   build:
@@ -14,6 +14,7 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/
       - run: yarn install
+      - run: yarn npm:release
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
