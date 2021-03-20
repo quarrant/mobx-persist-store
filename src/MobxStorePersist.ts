@@ -18,7 +18,7 @@ export class MobxStorePersist<T> {
       this,
       {
         clearPersist: action,
-        dispose: action,
+        disposePersist: action,
         isHydrated: observable,
         isPersisting: observable,
         rehydrateStore: action,
@@ -106,7 +106,7 @@ export class MobxStorePersist<T> {
     }
   }
 
-  public dispose(): void {
+  public disposePersist(): void {
     this.stopPersist();
 
     StorageConfiguration.delete(this.target);
