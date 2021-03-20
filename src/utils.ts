@@ -1,11 +1,5 @@
 import { isComputedProp, isObservableProp } from 'mobx';
 
-export function mobxNewestVersionSelect<A extends <T, P>(target: T, properties: P) => void>(v6: A, other: A) {
-  const dependenciesMobxVersion = require('mobx/package.json').version;
-  const [major] = dependenciesMobxVersion.split('.');
-  return Number(major) < 6 ? other : v6;
-}
-
 export function JSONParse<ReturnType>(json: string): ReturnType | undefined {
   let ret = undefined;
   try {
@@ -17,6 +11,7 @@ export function JSONParse<ReturnType>(json: string): ReturnType | undefined {
   }
 }
 
+/*
 export function getObjectKeys<ObjectType>(target: ObjectType): (keyof ObjectType)[] {
   return Object.keys(target) as (keyof ObjectType)[];
 }
@@ -48,3 +43,4 @@ export function getObservableTargetObject<T extends Object>(target: T, propertie
     return result;
   }, {} as T);
 }
+*/

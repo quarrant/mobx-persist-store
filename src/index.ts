@@ -1,8 +1,10 @@
-export { persistenceDecorator as persistence } from './persistenceDecorator';
-export * from './isPersistence';
-export * from './isSynchronized';
-export * from './StorageAdapter';
 export * from './clearPersist';
-export * from './stopPersist';
+export * from './disposePersist';
+export * from './isHydrated';
+export * from './isPersisting';
+export * from './MobxStorePersist';
+export * from './persistence';
+export * from './rehydrateStore';
 export * from './startPersist';
-export * from './rehydrate';
+export * from './stopPersist';
+export * from './StorageAdapter';

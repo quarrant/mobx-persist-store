@@ -1,5 +1,5 @@
 import { action, IReactionDisposer, makeObservable, observable, reaction, runInAction, toJS } from 'mobx';
-import { MobxStorePersistStorage } from './MobxStorePersist.utils';
+import { StorageConfiguration } from './StorageConfiguration';
 import { PersistenceDecoratorOptions } from './types';
 
 export class MobxStorePersist<T> {
@@ -21,22 +21,22 @@ export class MobxStorePersist<T> {
         dispose: action,
         isHydrated: observable,
         isPersisting: observable,
-        rehydrate: action,
+        rehydrateStore: action,
         startPersist: action,
         stopPersist: action,
       },
-      { autoBind: true, deep: false }
+      { autoBind: true, deep: false },
     );
 
     this.init();
   }
 
   private async init() {
-    await this.rehydrate();
+    await this.rehydrateStore();
     this.startPersist();
   }
 
-  public async rehydrate(): Promise<void> {
+  public async rehydrateStore(): Promise<void> {
     runInAction(() => {
       this.isHydrated = false;
     });
@@ -46,7 +46,7 @@ export class MobxStorePersist<T> {
 
       // Reassigning so TypeScript doesn't complain (Object is possibly 'null') about this.config and this.target within forEach
       const { properties } = this.options;
-      const target = this.target;
+      const target: any = this.target;
 
       if (data) {
         properties.forEach((propertyName: string) => {
@@ -71,7 +71,7 @@ export class MobxStorePersist<T> {
 
     // Reassigning so TypeScript doesn't complain (Object is possibly 'null') about this.config and this.target within reaction
     const { properties, adapter, name } = this.options;
-    const target = this.target;
+    const target: any = this.target;
 
     this.cancelWatch = reaction(
       () => {
@@ -85,7 +85,7 @@ export class MobxStorePersist<T> {
       },
       async (dataToSave) => {
         await adapter.writeInStorage(name, dataToSave);
-      }
+      },
     );
 
     this.isPersisting = true;
@@ -109,7 +109,7 @@ export class MobxStorePersist<T> {
   public dispose(): void {
     this.stopPersist();
 
-    MobxStorePersistStorage.delete(this.target);
+    StorageConfiguration.delete(this.target);
 
     this.cancelWatch = null;
     this.options = null;

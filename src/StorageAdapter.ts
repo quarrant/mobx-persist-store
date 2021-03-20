@@ -13,6 +13,7 @@ export class StorageAdapter {
   writeInStorage<T>(name: string, content: T): Promise<void | Error> {
     return new Promise((resolve, reject) => {
       const contentString = JSON.stringify(content);
+
       this.write(name, contentString)
         .then(resolve)
         .catch((error) => {
@@ -29,6 +30,7 @@ export class StorageAdapter {
           if (!content) return resolve(undefined);
 
           const contentObject = JSONParse<T>(content);
+
           return resolve(contentObject);
         })
         .catch((error) => {
