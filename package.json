@@ -5,6 +5,9 @@
   "author": "quarrant",
   "license": "MIT",
   "main": "lib/index.js",
+  "files": [
+    "lib/"
+  ],
   "keywords": [
     "mobx",
     "persist",
