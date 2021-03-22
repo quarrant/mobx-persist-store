@@ -50,11 +50,11 @@ export class MobxStorePersist<T> {
 
       if (data) {
         properties.forEach((propertyName: string) => {
-          // if (target.hasOwnProperty(propertyName)) {
-          runInAction(() => {
-            target[propertyName] = data[propertyName];
-          });
-          // }
+          if (target.hasOwnProperty(propertyName) && typeof data[propertyName] !== 'undefined') {
+            runInAction(() => {
+              target[propertyName] = data[propertyName];
+            });
+          }
         });
       }
     }
