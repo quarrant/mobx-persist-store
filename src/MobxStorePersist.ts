@@ -1,4 +1,14 @@
-import { action, IReactionDisposer, makeObservable, observable, reaction, runInAction, toJS } from 'mobx';
+import {
+  action,
+  IReactionDisposer,
+  isAction,
+  isComputedProp,
+  makeObservable,
+  observable,
+  reaction,
+  runInAction,
+  toJS,
+} from 'mobx';
 import { StorageConfiguration } from './StorageConfiguration';
 import { PersistenceDecoratorOptions } from './types';
 
@@ -33,10 +43,11 @@ export class MobxStorePersist<T> {
 
   private async init() {
     await this.rehydrateStore();
-    this.startPersist();
   }
 
   public async rehydrateStore(): Promise<void> {
+    this.stopPersist();
+
     runInAction(() => {
       this.isHydrated = false;
     });
@@ -50,7 +61,23 @@ export class MobxStorePersist<T> {
 
       if (data) {
         properties.forEach((propertyName: string) => {
-          if (target.hasOwnProperty(propertyName) && typeof data[propertyName] !== 'undefined') {
+          const isComputedProperty = isComputedProp(target, String(propertyName));
+          const isActionProperty = isAction(target[propertyName]);
+
+          if (isComputedProperty) {
+            console.warn(`The property '${propertyName}'  is computed and will not persist.`);
+          } else if (isActionProperty) {
+            console.warn(`The property '${propertyName}'  is an action and will not persist.`);
+          }
+
+          const allowPropertyHydration = [
+            target.hasOwnProperty(propertyName),
+            typeof data[propertyName] !== 'undefined',
+            !isComputedProperty,
+            !isActionProperty,
+          ].every(Boolean);
+
+          if (allowPropertyHydration) {
             runInAction(() => {
               target[propertyName] = data[propertyName];
             });
@@ -62,6 +89,8 @@ export class MobxStorePersist<T> {
     runInAction(() => {
       this.isHydrated = true;
     });
+
+    this.startPersist();
   }
 
   public startPersist(): void {
