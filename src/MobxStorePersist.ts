@@ -43,9 +43,13 @@ export class MobxStorePersist<T> {
 
   private async init() {
     await this.rehydrateStore();
+    this.startPersist();
   }
 
   public async rehydrateStore(): Promise<void> {
+    // If the user calls stopPersist and then rehydrateStore we don't want to automatically call startPersist below
+    const isBeingWatched = Boolean(this.cancelWatch);
+
     this.stopPersist();
 
     runInAction(() => {
@@ -90,7 +94,9 @@ export class MobxStorePersist<T> {
       this.isHydrated = true;
     });
 
-    this.startPersist();
+    if (isBeingWatched) {
+      this.startPersist();
+    }
   }
 
   public startPersist(): void {
