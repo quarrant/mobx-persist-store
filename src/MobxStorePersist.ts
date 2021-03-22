@@ -64,28 +64,28 @@ export class MobxStorePersist<T> {
       const target: any = this.target;
 
       if (data) {
-        properties.forEach((propertyName: string) => {
-          const isComputedProperty = isComputedProp(target, String(propertyName));
-          const isActionProperty = isAction(target[propertyName]);
+        runInAction(() => {
+          properties.forEach((propertyName: string) => {
+            const isComputedProperty = isComputedProp(target, String(propertyName));
+            const isActionProperty = isAction(target[propertyName]);
 
-          if (isComputedProperty) {
-            console.warn(`The property '${propertyName}'  is computed and will not persist.`);
-          } else if (isActionProperty) {
-            console.warn(`The property '${propertyName}'  is an action and will not persist.`);
-          }
+            if (isComputedProperty) {
+              console.warn(`The property '${propertyName}'  is computed and will not persist.`);
+            } else if (isActionProperty) {
+              console.warn(`The property '${propertyName}'  is an action and will not persist.`);
+            }
 
-          const allowPropertyHydration = [
-            target.hasOwnProperty(propertyName),
-            typeof data[propertyName] !== 'undefined',
-            !isComputedProperty,
-            !isActionProperty,
-          ].every(Boolean);
+            const allowPropertyHydration = [
+              target.hasOwnProperty(propertyName),
+              typeof data[propertyName] !== 'undefined',
+              !isComputedProperty,
+              !isActionProperty,
+            ].every(Boolean);
 
-          if (allowPropertyHydration) {
-            runInAction(() => {
+            if (allowPropertyHydration) {
               target[propertyName] = data[propertyName];
-            });
-          }
+            }
+          });
         });
       }
     }
