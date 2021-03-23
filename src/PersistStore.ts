@@ -10,17 +10,17 @@ import {
   toJS,
 } from 'mobx';
 import { StorageConfiguration } from './StorageConfiguration';
-import { PersistenceDecoratorOptions } from './types';
+import { PersistenceOptions } from './types';
 
-export class MobxStorePersist<T> {
+export class PersistStore<T> {
   private cancelWatch: IReactionDisposer | null = null;
-  private options: PersistenceDecoratorOptions | null = null;
+  private options: PersistenceOptions | null = null;
   private target: T | null = null;
 
   public isHydrated = false;
   public isPersisting = false;
 
-  constructor(options: PersistenceDecoratorOptions, target: T) {
+  constructor(options: PersistenceOptions, target: T) {
     this.options = options;
     this.target = target;
 

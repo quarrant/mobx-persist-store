@@ -1,11 +1,11 @@
-import { PersistenceDecoratorOptions } from './types';
-import { MobxStorePersist } from './MobxStorePersist';
+import { PersistenceOptions } from './types';
+import { PersistStore } from './PersistStore';
 import { StorageConfiguration } from './StorageConfiguration';
 
-export const persistence = (options: PersistenceDecoratorOptions) => <T>(target: T): MobxStorePersist<T> => {
-  const mobxStorePersist = new MobxStorePersist(options, target);
+export const persistence = (options: PersistenceOptions) => <T>(target: T): PersistStore<T> => {
+  const mobxPersistStore = new PersistStore(options, target);
 
-  StorageConfiguration.set(target, mobxStorePersist);
+  StorageConfiguration.set(target, mobxPersistStore);
 
-  return mobxStorePersist;
+  return mobxPersistStore;
 };
