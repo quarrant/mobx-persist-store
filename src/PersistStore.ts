@@ -66,20 +66,9 @@ export class PersistStore<T> {
       if (data) {
         runInAction(() => {
           properties.forEach((propertyName: string) => {
-            const isComputedProperty = isComputedProp(target, String(propertyName));
-            const isActionProperty = isAction(target[propertyName]);
-
-            if (isComputedProperty) {
-              console.warn(`The property '${propertyName}'  is computed and will not persist.`);
-            } else if (isActionProperty) {
-              console.warn(`The property '${propertyName}'  is an action and will not persist.`);
-            }
-
             const allowPropertyHydration = [
               target.hasOwnProperty(propertyName),
               typeof data[propertyName] !== 'undefined',
-              !isComputedProperty,
-              !isActionProperty,
             ].every(Boolean);
 
             if (allowPropertyHydration) {
@@ -110,13 +99,24 @@ export class PersistStore<T> {
 
     this.cancelWatch = reaction(
       () => {
-        const obj: Record<string, unknown> = {};
+        const propertiesToWatch: Record<string, unknown> = {};
 
-        properties.forEach((propName: string) => {
-          obj[propName] = toJS(target[propName]);
+        properties.forEach((propertyName: string) => {
+          const isComputedProperty = isComputedProp(target, String(propertyName));
+          const isActionProperty = isAction(target[propertyName]);
+
+          if (isComputedProperty) {
+            console.warn(`The property '${propertyName}'  is computed and will not persist.`);
+          } else if (isActionProperty) {
+            console.warn(`The property '${propertyName}'  is an action and will not persist.`);
+          }
+
+          if (!isComputedProperty && !isActionProperty) {
+            propertiesToWatch[propertyName] = toJS(target[propertyName]);
+          }
         });
 
-        return obj;
+        return propertiesToWatch;
       },
       async (dataToSave) => {
         await adapter.writeInStorage(name, dataToSave);
