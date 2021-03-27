@@ -9,6 +9,11 @@ export type PersistenceOptions = {
 };
 
 export type StorageAdapterOptions = {
-  write: (name: string, value: string) => Promise<Error | void>;
-  read: (name: string) => Promise<string | undefined>;
+  // jsonify bool Enables serialization as JSON
+  jsonify?: boolean; // default true
+  removeOnExpiration?: boolean; // default true
+  expiration?: number; // milliseconds
+  getItem: <T>(key: string) => Promise<string | T>;
+  setItem: (key: string, item: any) => Promise<void>;
+  removeItem: (key: string) => Promise<void>;
 };

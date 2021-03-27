@@ -1470,6 +1470,11 @@
     jest-diff "^26.0.0"
     pretty-format "^26.0.0"
 
+"@types/milliseconds@^0.0.30":
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/@types/milliseconds/-/milliseconds-0.0.30.tgz#d779ac94f9ba2187b8b84997f65b8ce950b3c13c"
+  integrity sha512-MVgBCpNG6tuPctUGqaGsbMLm5E4bYy8Ki7G4RMmcMH83e15iMY9L7bJccWpXv3Zyo8y0GQlvUj+yOShWlQlTOA==
+
 "@types/node@*":
   version "14.14.35"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.35.tgz#42c953a4e2b18ab931f72477e7012172f4ffa313"
@@ -3562,6 +3567,11 @@ micromatch@^4.0.2:
   dependencies:
     braces "^3.0.1"
     picomatch "^2.0.5"
+
+milliseconds@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/milliseconds/-/milliseconds-1.0.3.tgz#1ff437c4f734b138ef7c2cedba4d8880c7f5c2d8"
+  integrity sha1-H/Q3xPc0sTjvfCztuk2IgMf1wtg=
 
 mime-db@1.44.0:
   version "1.44.0"

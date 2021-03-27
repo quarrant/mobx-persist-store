@@ -1,48 +1,140 @@
-const { StorageAdapter } = require('../src/StorageAdapter');
+import { StorageAdapter } from '../src';
+import ms from 'milliseconds';
 
-const testStorage: Record<string, unknown> = {
-  testRead: JSON.stringify({ test: 'testContent' }),
-  mockStore: undefined,
-};
+let testStorage: Record<string, any> = {};
 
-function testWriteInJson(name: string, content: Record<string, unknown>): Promise<void> {
-  return new Promise((resolve) => {
-    Object.assign(testStorage, { [name]: content });
-    resolve();
-  });
+async function setItemTestHandler(name: string, content: string): Promise<void> {
+  Object.assign(testStorage, { [name]: content });
 }
 
-function testReadFromJson(name: string) {
-  return new Promise((resolve) => {
-    if (testStorage[name]) {
-      resolve(testStorage[name]);
-    }
-  });
+async function getItemTestHandler<T>(name: string): Promise<string | T> {
+  return testStorage[name];
 }
 
-const storage = new StorageAdapter({ write: testWriteInJson, read: testReadFromJson });
+async function removeItemTestHandler(name: string): Promise<void> {
+  delete testStorage[name];
+}
 
-const mockStore: Record<string, unknown> = {
-  4: 'test',
-  5: 1,
-  6: 1.15,
-  7: { 0: 'a' },
-  8: [1, 1],
-  9: 1e15,
-};
+describe('StorageAdapter', () => {
+  const mockStore: Record<string, unknown> = {
+    4: 'test',
+    5: 1,
+    6: 1.15,
+    7: { 0: 'a' },
+    8: [1, 1],
+    9: 1e15,
+  };
 
-describe('mock store', () => {
-  beforeAll(() => {
-    storage.writeInStorage('mockStore', mockStore);
+  let storage: StorageAdapter;
+
+  describe('jsonify option equals true', () => {
+    beforeEach(() => {
+      testStorage = {};
+      storage = new StorageAdapter({
+        // jsonify: true, // true is the default
+        setItem: setItemTestHandler,
+        getItem: getItemTestHandler,
+        removeItem: removeItemTestHandler,
+      });
+    });
+
+    describe('setItem', () => {
+      test(`write to storage as stringify`, async () => {
+        await storage.setItem('mockStore', mockStore);
+
+        const actualResult = testStorage['mockStore'];
+        const expectedResult = JSON.stringify(mockStore);
+
+        expect(actualResult).toEqual(expectedResult);
+        expect(typeof expectedResult).toBe('string');
+      });
+    });
+
+    describe('getItem', () => {
+      test(`should read storage data and be an object`, async () => {
+        await storage.setItem('mockStore', mockStore);
+
+        const actualResult = await storage.getItem('mockStore');
+        const expectedResult = mockStore;
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+    });
+
+    describe('removeItem', () => {
+      test(`should read storage data and be an object`, async () => {
+        await storage.setItem('mockStore', mockStore);
+        await storage.removeItem('mockStore');
+
+        const actualResult = await storage.getItem('mockStore');
+        const expectedResult = {};
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+    });
   });
 
-  it(`writeInStore`, () => {
-    expect(testStorage['mockStore']).toEqual(JSON.stringify(mockStore));
-  });
+  describe('jsonify option equals false', () => {
+    beforeEach(() => {
+      testStorage = {};
+      storage = new StorageAdapter({
+        jsonify: false,
+        setItem: setItemTestHandler,
+        getItem: getItemTestHandler,
+        removeItem: removeItemTestHandler,
+      });
+    });
 
-  it(`readFromStore`, () => {
-    storage.readFromStorage('mockStore').then((content: Record<string, unknown>) => {
-      expect(content).toEqual(mockStore);
+    describe('setItem', () => {
+      test(`write to storage as stringify`, async () => {
+        await storage.setItem('mockStore', mockStore);
+
+        const actualResult = testStorage['mockStore'];
+        const expectedResult = mockStore;
+
+        expect(actualResult).toEqual(expectedResult);
+        expect(typeof expectedResult).toBe('object');
+      });
+    });
+
+    describe('getItem', () => {
+      test(`should read storage data and be an object`, async () => {
+        await storage.setItem('mockStore', mockStore);
+
+        const actualResult = await storage.getItem('mockStore');
+        const expectedResult = mockStore;
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+    });
+
+    describe('removeItem', () => {
+      test(`should read storage data and be an object`, async () => {
+        await storage.setItem('mockStore', mockStore);
+        await storage.removeItem('mockStore');
+
+        const actualResult = await storage.getItem('mockStore');
+        const expectedResult = {};
+
+        expect(actualResult).toEqual(expectedResult);
+      });
     });
   });
 });
+
+// ms.seconds(2);
+
+// if (process.env.NODE_ENV !== 'production')
+//   console.warn(`redux-persist ${storageType} test failed, persistence will be disabled.`);
+// }
+
+// persistor object
+// the persistor object is returned by persistStore with the following methods:
+//   .purge()
+// purges state from disk and returns a promise
+//   .flush()
+// immediately writes all pending state to disk and returns a promise
+//   .pause()
+// pauses persistence
+//   .persist()
+// resumes persistence

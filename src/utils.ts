@@ -1,10 +1,18 @@
-export function JSONParse<ReturnType>(json: string): ReturnType | undefined {
-  let ret = undefined;
-  try {
-    ret = JSON.parse(json);
-  } catch (error) {
-    console.warn('JSON Parse error', { json, error });
-  } finally {
-    return ret;
+// A function that performs no operations.
+export const noop = Function.prototype as <T>(...params: T[]) => T;
+
+export const delay = (durationInMilliseconds: number = 250): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, durationInMilliseconds));
+};
+
+export const buildExpireTimestamp = (milliseconds: number): number => {
+  return new Date().getTime() + milliseconds;
+};
+
+export const hasTimestampExpired = (milliseconds: number): boolean => {
+  if (isNaN(milliseconds)) {
+    return false;
   }
-}
+
+  return new Date(milliseconds).getTime() > new Date().getTime();
+};

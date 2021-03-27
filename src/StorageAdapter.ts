@@ -1,42 +1,48 @@
 import { StorageAdapterOptions } from './types';
-import { JSONParse } from './utils';
+import { buildExpireTimestamp, hasTimestampExpired } from './utils';
 
 export class StorageAdapter {
-  private write: StorageAdapterOptions['write'];
-  private read: StorageAdapterOptions['read'];
+  private readonly options: StorageAdapterOptions;
 
   constructor(options: StorageAdapterOptions) {
-    this.write = options.write;
-    this.read = options.read;
+    this.options = options;
   }
 
-  writeInStorage<T>(name: string, content: T): Promise<void | Error> {
-    return new Promise((resolve, reject) => {
-      const contentString = JSON.stringify(content);
-
-      this.write(name, contentString)
-        .then(resolve)
-        .catch((error) => {
-          console.warn(`StorageAdapter.writeInStorage [${name}]`, error);
-          reject(error);
-        });
-    });
-  }
-
-  readFromStorage<T>(name: string): Promise<T | undefined> {
-    return new Promise((resolve, reject) => {
-      this.read(name)
-        .then((content) => {
-          if (!content) return resolve(undefined);
-
-          const contentObject = JSONParse<T>(content);
-
-          return resolve(contentObject);
+  async setItem<T>(key: string, item: T): Promise<void> {
+    const { jsonify = true, expiration } = this.options;
+    const data = expiration
+      ? Object.assign(item, {
+          __mps__: {
+            expireTimestamp: buildExpireTimestamp(expiration),
+          },
         })
-        .catch((error) => {
-          console.warn(`StorageAdapter.readFromStorage [${name}]`, error);
-          reject(error);
-        });
-    });
+      : item;
+    const content = jsonify ? JSON.stringify(data) : data;
+
+    return this.options.setItem(key, content);
+  }
+
+  async getItem<T extends Record<string, any>>(key: string): Promise<T> {
+    const { removeOnExpiration = true } = this.options;
+    const data = await this.options.getItem<T>(key);
+    let parsedData: T;
+
+    try {
+      parsedData = JSON.parse(data as string);
+    } catch (error) {
+      parsedData = (data || {}) as T;
+    }
+
+    const hasExpired = hasTimestampExpired(parsedData.__mps__?.expireTimestamp);
+
+    if (hasExpired && removeOnExpiration) {
+      await this.removeItem(key);
+    }
+
+    return hasExpired ? ({} as T) : parsedData;
+  }
+
+  async removeItem(key: string): Promise<void> {
+    await this.options.removeItem(key);
   }
 }
