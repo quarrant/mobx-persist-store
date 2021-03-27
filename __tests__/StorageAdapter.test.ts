@@ -16,6 +16,7 @@ async function removeItemTestHandler(name: string): Promise<void> {
 }
 
 describe('StorageAdapter', () => {
+  let storage: StorageAdapter;
   const mockStore: Record<string, unknown> = {
     4: 'test',
     5: 1,
@@ -24,8 +25,6 @@ describe('StorageAdapter', () => {
     8: [1, 1],
     9: 1e15,
   };
-
-  let storage: StorageAdapter;
 
   describe('jsonify option equals true', () => {
     beforeEach(() => {
@@ -95,6 +94,14 @@ describe('StorageAdapter', () => {
         expect(actualResult).toEqual(expectedResult);
         expect(typeof expectedResult).toBe('object');
       });
+
+      test(`should not have __mps__`, async () => {
+        await storage.setItem('mockStore', mockStore);
+
+        const actualResult = testStorage['mockStore'];
+
+        expect(actualResult).not.toHaveProperty('__mps__');
+      });
     });
 
     describe('getItem', () => {
@@ -120,9 +127,68 @@ describe('StorageAdapter', () => {
       });
     });
   });
-});
 
-// ms.seconds(2);
+  describe('expiration option with non-expired data', () => {
+    beforeEach(() => {
+      testStorage = {};
+      storage = new StorageAdapter({
+        expiration: ms.seconds(1),
+        jsonify: false, // easier to test when data is not a string
+        // removeOnExpiration: false,
+        setItem: setItemTestHandler,
+        getItem: getItemTestHandler,
+        removeItem: removeItemTestHandler,
+      });
+    });
+
+    describe('setItem', () => {
+      test(`should have expireTimestamp on __mps__`, async () => {
+        await storage.setItem('mockStore', mockStore);
+
+        const actualResult = testStorage['mockStore'];
+
+        expect(actualResult).toHaveProperty('__mps__');
+        expect(actualResult.__mps__).toHaveProperty('expireTimestamp');
+      });
+    });
+
+    describe('getItem', () => {
+      test(`should read non-expired data`, async () => {
+        await storage.setItem('mockStore', mockStore);
+
+        const actualResult = await storage.getItem('mockStore');
+        const expectedResult = mockStore;
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+    });
+  });
+
+  describe('expiration option', () => {
+    beforeEach(() => {
+      testStorage = {};
+      storage = new StorageAdapter({
+        expiration: -1, // one millisecond before now
+        jsonify: false, // easier to test when data is not a string
+        // removeOnExpiration: false,
+        setItem: setItemTestHandler,
+        getItem: getItemTestHandler,
+        removeItem: removeItemTestHandler,
+      });
+    });
+
+    describe('getItem', () => {
+      test(`should read non-expired data`, async () => {
+        await storage.setItem('mockStore', mockStore);
+
+        const actualResult = await storage.getItem('mockStore');
+        const expectedResult = mockStore;
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+    });
+  });
+});
 
 // if (process.env.NODE_ENV !== 'production')
 //   console.warn(`redux-persist ${storageType} test failed, persistence will be disabled.`);

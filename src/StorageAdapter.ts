@@ -34,7 +34,8 @@ export class StorageAdapter {
     }
 
     const hasExpired = hasTimestampExpired(parsedData.__mps__?.expireTimestamp);
-
+    // console.log(`hasExpired`, hasExpired);
+    // console.log(`removeOnExpiration`, removeOnExpiration);
     if (hasExpired && removeOnExpiration) {
       await this.removeItem(key);
     }
