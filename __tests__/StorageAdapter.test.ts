@@ -134,7 +134,6 @@ describe('StorageAdapter', () => {
       storage = new StorageAdapter({
         expiration: ms.seconds(1),
         jsonify: false, // easier to test when data is not a string
-        // removeOnExpiration: false,
         setItem: setItemTestHandler,
         getItem: getItemTestHandler,
         removeItem: removeItemTestHandler,
@@ -164,13 +163,12 @@ describe('StorageAdapter', () => {
     });
   });
 
-  describe('expiration option', () => {
+  describe('expiration option with expired data', () => {
     beforeEach(() => {
       testStorage = {};
       storage = new StorageAdapter({
         expiration: -1, // one millisecond before now
         jsonify: false, // easier to test when data is not a string
-        // removeOnExpiration: false,
         setItem: setItemTestHandler,
         getItem: getItemTestHandler,
         removeItem: removeItemTestHandler,
@@ -178,10 +176,58 @@ describe('StorageAdapter', () => {
     });
 
     describe('getItem', () => {
-      test(`should read non-expired data`, async () => {
+      test(`should return empty object`, async () => {
         await storage.setItem('mockStore', mockStore);
 
         const actualResult = await storage.getItem('mockStore');
+        const expectedResult = {};
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+    });
+
+    describe('check storage', () => {
+      test(`should delete data in storage`, async () => {
+        await storage.getItem('mockStore');
+
+        const actualResult = testStorage['mockStore'];
+        const expectedResult = undefined;
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+    });
+  });
+
+  describe('removeOnExpiration option', () => {
+    beforeEach(() => {
+      testStorage = {};
+      storage = new StorageAdapter({
+        expiration: -1, // one millisecond before now
+        jsonify: false, // easier to test when data is not a string
+        removeOnExpiration: false,
+        setItem: setItemTestHandler,
+        getItem: getItemTestHandler,
+        removeItem: removeItemTestHandler,
+      });
+    });
+
+    describe('getItem', () => {
+      test(`should return empty object`, async () => {
+        await storage.setItem('mockStore', mockStore);
+
+        const actualResult = await storage.getItem('mockStore');
+        const expectedResult = {};
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+    });
+
+    describe('check storage', () => {
+      test(`should not delete data in storage`, async () => {
+        await storage.setItem('mockStore', mockStore);
+        await storage.getItem('mockStore');
+
+        const actualResult = testStorage['mockStore'];
         const expectedResult = mockStore;
 
         expect(actualResult).toEqual(expectedResult);
@@ -189,18 +235,3 @@ describe('StorageAdapter', () => {
     });
   });
 });
-
-// if (process.env.NODE_ENV !== 'production')
-//   console.warn(`redux-persist ${storageType} test failed, persistence will be disabled.`);
-// }
-
-// persistor object
-// the persistor object is returned by persistStore with the following methods:
-//   .purge()
-// purges state from disk and returns a promise
-//   .flush()
-// immediately writes all pending state to disk and returns a promise
-//   .pause()
-// pauses persistence
-//   .persist()
-// resumes persistence
