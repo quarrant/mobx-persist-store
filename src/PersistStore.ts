@@ -57,7 +57,7 @@ export class PersistStore<T> {
     });
 
     if (this.options && this.target) {
-      const data: Record<string, unknown> | undefined = await this.options.adapter.readFromStorage(this.options.name);
+      const data: Record<string, unknown> | undefined = await this.options.adapter.getItem(this.options.name);
 
       // Reassigning so TypeScript doesn't complain (Object is possibly 'null') about this.config and this.target within forEach
       const { properties } = this.options;
@@ -119,7 +119,7 @@ export class PersistStore<T> {
         return propertiesToWatch;
       },
       async (dataToSave) => {
-        await adapter.writeInStorage(name, dataToSave);
+        await adapter.setItem(name, dataToSave);
       },
     );
 
@@ -137,7 +137,7 @@ export class PersistStore<T> {
 
   public async clearPersist(): Promise<void> {
     if (this.options?.adapter) {
-      await this.options.adapter.writeInStorage(this.options.name, {});
+      await this.options.adapter.setItem(this.options.name, {});
     }
   }
 

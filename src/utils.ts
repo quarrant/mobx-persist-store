@@ -1,10 +1,10 @@
-export function JSONParse<ReturnType>(json: string): ReturnType | undefined {
-  let ret = undefined;
-  try {
-    ret = JSON.parse(json);
-  } catch (error) {
-    console.warn('JSON Parse error', { json, error });
-  } finally {
-    return ret;
-  }
-}
+export const buildExpireTimestamp = (milliseconds: number): number => {
+  return new Date().getTime() + milliseconds;
+};
+
+export const hasTimestampExpired = (milliseconds: number): boolean => {
+  const dateTimeNow = new Date().getTime();
+  const dateTimeExpiration = new Date(milliseconds).getTime();
+
+  return dateTimeExpiration <= dateTimeNow;
+};
