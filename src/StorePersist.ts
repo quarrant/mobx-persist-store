@@ -13,7 +13,7 @@ import { StorageConfiguration } from './StorageConfiguration';
 import { PersistenceStorageOptions, ReactionOptions } from './types';
 import { StorageAdapter } from './StorageAdapter';
 
-export class PersistStore<T, P extends keyof T> {
+export class StorePersist<T, P extends keyof T> {
   private cancelWatch: IReactionDisposer | null = null;
   private properties: string[] = [];
   private reactionOptions: ReactionOptions | null = null;
