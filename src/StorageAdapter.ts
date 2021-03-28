@@ -13,7 +13,7 @@ export class StorageAdapter {
     const data = expireIn
       ? Object.assign(item, {
           __mps__: {
-            expireTimestamp: buildExpireTimestamp(expireIn),
+            expireInTimestamp: buildExpireTimestamp(expireIn),
           },
         })
       : item;
@@ -33,7 +33,7 @@ export class StorageAdapter {
       parsedData = (data || {}) as T;
     }
 
-    const hasExpired = hasTimestampExpired(parsedData.__mps__?.expireTimestamp);
+    const hasExpired = hasTimestampExpired(parsedData.__mps__?.expireInTimestamp);
 
     if (hasExpired && removeOnExpiration) {
       await this.removeItem(key);

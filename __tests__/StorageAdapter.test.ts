@@ -141,13 +141,13 @@ describe('StorageAdapter', () => {
     });
 
     describe('setItem', () => {
-      test(`should have expireTimestamp on __mps__`, async () => {
+      test(`should have expireInTimestamp on __mps__`, async () => {
         await storage.setItem('mockStore', mockStore);
 
         const actualResult = testStorage['mockStore'];
 
         expect(actualResult).toHaveProperty('__mps__');
-        expect(actualResult.__mps__).toHaveProperty('expireTimestamp');
+        expect(actualResult.__mps__).toHaveProperty('expireInTimestamp');
       });
     });
 
