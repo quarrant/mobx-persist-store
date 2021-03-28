@@ -132,7 +132,7 @@ describe('StorageAdapter', () => {
     beforeEach(() => {
       testStorage = {};
       storage = new StorageAdapter({
-        expiration: ms.seconds(1),
+        expireIn: ms.seconds(1),
         jsonify: false, // easier to test when data is not a string
         setItem: setItemTestHandler,
         getItem: getItemTestHandler,
@@ -167,7 +167,7 @@ describe('StorageAdapter', () => {
     beforeEach(() => {
       testStorage = {};
       storage = new StorageAdapter({
-        expiration: -1, // one millisecond before now
+        expireIn: -1, // one millisecond before now
         jsonify: false, // easier to test when data is not a string
         setItem: setItemTestHandler,
         getItem: getItemTestHandler,
@@ -202,7 +202,7 @@ describe('StorageAdapter', () => {
     beforeEach(() => {
       testStorage = {};
       storage = new StorageAdapter({
-        expiration: -1, // one millisecond before now
+        expireIn: -1, // one millisecond before now
         jsonify: false, // easier to test when data is not a string
         removeOnExpiration: false,
         setItem: setItemTestHandler,

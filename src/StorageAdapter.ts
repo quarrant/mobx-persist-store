@@ -9,11 +9,11 @@ export class StorageAdapter {
   }
 
   async setItem<T>(key: string, item: T): Promise<void> {
-    const { jsonify = true, expiration } = this.options;
-    const data = expiration
+    const { jsonify = true, expireIn } = this.options;
+    const data = expireIn
       ? Object.assign(item, {
           __mps__: {
-            expireTimestamp: buildExpireTimestamp(expiration),
+            expireTimestamp: buildExpireTimestamp(expireIn),
           },
         })
       : item;

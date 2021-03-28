@@ -19,9 +19,9 @@ export type StorageAdapterOptions = {
    *
    * Recommend the library https://github.com/henrikjoreteg/milliseconds to set the value
    */
-  expiration?: number;
+  expireIn?: number;
   /**
-   * @property {Number} [removeOnExpiration] If {@link StorageAdapterOptions#expiration} has a value and has expired the data in storage will be remove automatically when getItem is called. The default value is true.
+   * @property {Number} [removeOnExpiration] If {@link StorageAdapterOptions#expireIn} has a value and has expired the data in storage will be remove automatically when getItem is called. The default value is true.
    * @default true
    */
   removeOnExpiration?: boolean;
