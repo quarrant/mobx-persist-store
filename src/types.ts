@@ -21,7 +21,7 @@ export type StorageAdapterOptions = {
    */
   expireIn?: number;
   /**
-   * @property {Number} [removeOnExpiration] If {@link StorageAdapterOptions#expireIn} has a value and has expired the data in storage will be remove automatically when getItem is called. The default value is true.
+   * @property {Number} [removeOnExpiration] If {@link StorageAdapterOptions#expireIn} has a value and has expired, the data in storage will be removed automatically when getItem is called. The default value is true.
    * @default true
    */
   removeOnExpiration?: boolean;
