@@ -1,36 +1,36 @@
-import { StorageAdapterOptions } from './types';
+import { StorageOptions } from './types';
 import { buildExpireTimestamp, hasTimestampExpired } from './utils';
 
 export class StorageAdapter {
-  private readonly options: StorageAdapterOptions;
+  private readonly options: StorageOptions;
 
-  constructor(options: StorageAdapterOptions) {
+  constructor(options: StorageOptions) {
     this.options = options;
   }
 
-  async setItem<T>(key: string, item: T): Promise<void> {
-    const { jsonify = true, expireIn } = this.options;
-    const data = expireIn
+  async setItem<T extends Record<string, unknown>>(key: string, item: T): Promise<void> {
+    const { stringify = true, expireIn } = this.options;
+    const data: T = expireIn
       ? Object.assign(item, {
           __mps__: {
             expireInTimestamp: buildExpireTimestamp(expireIn),
           },
         })
       : item;
-    const content = jsonify ? JSON.stringify(data) : data;
+    const content = stringify ? JSON.stringify(data) : data;
 
-    return this.options.setItem(key, content);
+    await this.options.storage?.setItem(key, content);
   }
 
   async getItem<T extends Record<string, any>>(key: string): Promise<T> {
     const { removeOnExpiration = true } = this.options;
-    const data = await this.options.getItem<T>(key);
+    const data = await this.options.storage?.getItem(key);
     let parsedData: T;
 
     try {
-      parsedData = JSON.parse(data as string);
+      parsedData = JSON.parse(data as string) || {};
     } catch (error) {
-      parsedData = (data || {}) as T;
+      parsedData = (data as T) || {};
     }
 
     const hasExpired = hasTimestampExpired(parsedData.__mps__?.expireInTimestamp);
@@ -43,6 +43,6 @@ export class StorageAdapter {
   }
 
   async removeItem(key: string): Promise<void> {
-    await this.options.removeItem(key);
+    await this.options.storage?.removeItem(key);
   }
 }

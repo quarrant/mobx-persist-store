@@ -16,7 +16,7 @@ async function removeItemTestHandler(name: string): Promise<void> {
 }
 
 describe('StorageAdapter', () => {
-  let storage: StorageAdapter;
+  let storageAdapter: StorageAdapter;
   const mockStore: Record<string, unknown> = {
     4: 'test',
     5: 1,
@@ -26,20 +26,22 @@ describe('StorageAdapter', () => {
     9: 1e15,
   };
 
-  describe('jsonify option equals true', () => {
+  describe('stringify option equals true', () => {
     beforeEach(() => {
       testStorage = {};
-      storage = new StorageAdapter({
-        // jsonify: true, // true is the default
-        setItem: setItemTestHandler,
-        getItem: getItemTestHandler,
-        removeItem: removeItemTestHandler,
+      storageAdapter = new StorageAdapter({
+        // stringify: true, // true is the default
+        storage: {
+          setItem: setItemTestHandler,
+          getItem: getItemTestHandler,
+          removeItem: removeItemTestHandler,
+        },
       });
     });
 
     describe('setItem', () => {
       test(`write to storage as stringify`, async () => {
-        await storage.setItem('mockStore', mockStore);
+        await storageAdapter.setItem('mockStore', mockStore);
 
         const actualResult = testStorage['mockStore'];
         const expectedResult = JSON.stringify(mockStore);
@@ -51,9 +53,9 @@ describe('StorageAdapter', () => {
 
     describe('getItem', () => {
       test(`should read storage data and be an object`, async () => {
-        await storage.setItem('mockStore', mockStore);
+        await storageAdapter.setItem('mockStore', mockStore);
 
-        const actualResult = await storage.getItem('mockStore');
+        const actualResult = await storageAdapter.getItem('mockStore');
         const expectedResult = mockStore;
 
         expect(actualResult).toEqual(expectedResult);
@@ -62,10 +64,10 @@ describe('StorageAdapter', () => {
 
     describe('removeItem', () => {
       test(`should read storage data and be an object`, async () => {
-        await storage.setItem('mockStore', mockStore);
-        await storage.removeItem('mockStore');
+        await storageAdapter.setItem('mockStore', mockStore);
+        await storageAdapter.removeItem('mockStore');
 
-        const actualResult = await storage.getItem('mockStore');
+        const actualResult = await storageAdapter.getItem('mockStore');
         const expectedResult = {};
 
         expect(actualResult).toEqual(expectedResult);
@@ -73,20 +75,22 @@ describe('StorageAdapter', () => {
     });
   });
 
-  describe('jsonify option equals false', () => {
+  describe('stringify option equals false', () => {
     beforeEach(() => {
       testStorage = {};
-      storage = new StorageAdapter({
-        jsonify: false,
-        setItem: setItemTestHandler,
-        getItem: getItemTestHandler,
-        removeItem: removeItemTestHandler,
+      storageAdapter = new StorageAdapter({
+        stringify: false,
+        storage: {
+          setItem: setItemTestHandler,
+          getItem: getItemTestHandler,
+          removeItem: removeItemTestHandler,
+        },
       });
     });
 
     describe('setItem', () => {
       test(`write to storage as stringify`, async () => {
-        await storage.setItem('mockStore', mockStore);
+        await storageAdapter.setItem('mockStore', mockStore);
 
         const actualResult = testStorage['mockStore'];
         const expectedResult = mockStore;
@@ -96,7 +100,7 @@ describe('StorageAdapter', () => {
       });
 
       test(`should not have __mps__`, async () => {
-        await storage.setItem('mockStore', mockStore);
+        await storageAdapter.setItem('mockStore', mockStore);
 
         const actualResult = testStorage['mockStore'];
 
@@ -106,9 +110,9 @@ describe('StorageAdapter', () => {
 
     describe('getItem', () => {
       test(`should read storage data and be an object`, async () => {
-        await storage.setItem('mockStore', mockStore);
+        await storageAdapter.setItem('mockStore', mockStore);
 
-        const actualResult = await storage.getItem('mockStore');
+        const actualResult = await storageAdapter.getItem('mockStore');
         const expectedResult = mockStore;
 
         expect(actualResult).toEqual(expectedResult);
@@ -117,10 +121,10 @@ describe('StorageAdapter', () => {
 
     describe('removeItem', () => {
       test(`should read storage data and be an object`, async () => {
-        await storage.setItem('mockStore', mockStore);
-        await storage.removeItem('mockStore');
+        await storageAdapter.setItem('mockStore', mockStore);
+        await storageAdapter.removeItem('mockStore');
 
-        const actualResult = await storage.getItem('mockStore');
+        const actualResult = await storageAdapter.getItem('mockStore');
         const expectedResult = {};
 
         expect(actualResult).toEqual(expectedResult);
@@ -131,18 +135,20 @@ describe('StorageAdapter', () => {
   describe('expiration option with non-expired data', () => {
     beforeEach(() => {
       testStorage = {};
-      storage = new StorageAdapter({
+      storageAdapter = new StorageAdapter({
         expireIn: ms.seconds(1),
-        jsonify: false, // easier to test when data is not a string
-        setItem: setItemTestHandler,
-        getItem: getItemTestHandler,
-        removeItem: removeItemTestHandler,
+        stringify: false, // easier to test when data is not a string
+        storage: {
+          setItem: setItemTestHandler,
+          getItem: getItemTestHandler,
+          removeItem: removeItemTestHandler,
+        },
       });
     });
 
     describe('setItem', () => {
       test(`should have expireInTimestamp on __mps__`, async () => {
-        await storage.setItem('mockStore', mockStore);
+        await storageAdapter.setItem('mockStore', mockStore);
 
         const actualResult = testStorage['mockStore'];
 
@@ -153,9 +159,9 @@ describe('StorageAdapter', () => {
 
     describe('getItem', () => {
       test(`should read non-expired data`, async () => {
-        await storage.setItem('mockStore', mockStore);
+        await storageAdapter.setItem('mockStore', mockStore);
 
-        const actualResult = await storage.getItem('mockStore');
+        const actualResult = await storageAdapter.getItem('mockStore');
         const expectedResult = mockStore;
 
         expect(actualResult).toEqual(expectedResult);
@@ -166,20 +172,22 @@ describe('StorageAdapter', () => {
   describe('expiration option with expired data', () => {
     beforeEach(() => {
       testStorage = {};
-      storage = new StorageAdapter({
+      storageAdapter = new StorageAdapter({
         expireIn: -1, // one millisecond before now
-        jsonify: false, // easier to test when data is not a string
-        setItem: setItemTestHandler,
-        getItem: getItemTestHandler,
-        removeItem: removeItemTestHandler,
+        stringify: false, // easier to test when data is not a string
+        storage: {
+          setItem: setItemTestHandler,
+          getItem: getItemTestHandler,
+          removeItem: removeItemTestHandler,
+        },
       });
     });
 
     describe('getItem', () => {
       test(`should return empty object`, async () => {
-        await storage.setItem('mockStore', mockStore);
+        await storageAdapter.setItem('mockStore', mockStore);
 
-        const actualResult = await storage.getItem('mockStore');
+        const actualResult = await storageAdapter.getItem('mockStore');
         const expectedResult = {};
 
         expect(actualResult).toEqual(expectedResult);
@@ -188,7 +196,7 @@ describe('StorageAdapter', () => {
 
     describe('check storage', () => {
       test(`should delete data in storage`, async () => {
-        await storage.getItem('mockStore');
+        await storageAdapter.getItem('mockStore');
 
         const actualResult = testStorage['mockStore'];
         const expectedResult = undefined;
@@ -201,21 +209,23 @@ describe('StorageAdapter', () => {
   describe('removeOnExpiration option', () => {
     beforeEach(() => {
       testStorage = {};
-      storage = new StorageAdapter({
+      storageAdapter = new StorageAdapter({
         expireIn: -1, // one millisecond before now
-        jsonify: false, // easier to test when data is not a string
+        stringify: false, // easier to test when data is not a string
         removeOnExpiration: false,
-        setItem: setItemTestHandler,
-        getItem: getItemTestHandler,
-        removeItem: removeItemTestHandler,
+        storage: {
+          setItem: setItemTestHandler,
+          getItem: getItemTestHandler,
+          removeItem: removeItemTestHandler,
+        },
       });
     });
 
     describe('getItem', () => {
       test(`should return empty object`, async () => {
-        await storage.setItem('mockStore', mockStore);
+        await storageAdapter.setItem('mockStore', mockStore);
 
-        const actualResult = await storage.getItem('mockStore');
+        const actualResult = await storageAdapter.getItem('mockStore');
         const expectedResult = {};
 
         expect(actualResult).toEqual(expectedResult);
@@ -224,8 +234,8 @@ describe('StorageAdapter', () => {
 
     describe('check storage', () => {
       test(`should not delete data in storage`, async () => {
-        await storage.setItem('mockStore', mockStore);
-        await storage.getItem('mockStore');
+        await storageAdapter.setItem('mockStore', mockStore);
+        await storageAdapter.getItem('mockStore');
 
         const actualResult = testStorage['mockStore'];
         const expectedResult = mockStore;

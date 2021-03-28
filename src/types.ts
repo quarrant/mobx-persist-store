@@ -1,30 +1,37 @@
 import { IReactionOptions } from 'mobx';
 import { StorageAdapter } from './StorageAdapter';
 
-export type PersistenceOptions = {
+export interface PersistenceStorageOptions<P> extends StorageOptions {
+  properties: P[];
   name: string;
-  properties: string[];
-  adapter: StorageAdapter;
-  reactionOptions?: IReactionOptions;
-};
+}
 
-export type StorageAdapterOptions = {
+export type ReactionOptions = Pick<IReactionOptions, 'delay'>;
+
+export interface StorageOptions {
   /**
    * @property {Boolean} [jsonify] When true the data will be JSON.stringify before being passed to setItem. The default value is true.
    * @default true
    */
-  jsonify?: boolean;
+  stringify?: boolean;
   /**
-   * @property {Number} [expiration] A value in milliseconds to determine when the data in storage should not be retrieved by getItem.
+   * @property {Number} [expireIn] A value in milliseconds to determine when the data in storage should not be retrieved by getItem.
    *
    * Recommend the library https://github.com/henrikjoreteg/milliseconds to set the value
    */
   expireIn?: number;
   /**
-   * @property {Number} [removeOnExpiration] If {@link StorageAdapterOptions#expireIn} has a value and has expired, the data in storage will be removed automatically when getItem is called. The default value is true.
+   * @property {Number} [removeOnExpiration] If {@link StorageOptions#expireIn} has a value and has expired, the data in storage will be removed automatically when getItem is called. The default value is true.
    * @default true
    */
   removeOnExpiration?: boolean;
+  /**
+   *
+   */
+  storage: StorageController | undefined;
+}
+
+export interface StorageController {
   /**
    * The function that will retrieved the storage data by a specific identifier.
    *
@@ -32,15 +39,16 @@ export type StorageAdapterOptions = {
    * @param {String} key
    * @return {Promise<String | Object>}
    */
-  getItem: <T>(key: string) => Promise<string | T>;
+  getItem<T>(key: string): T | string | null | Promise<T | string | null>;
   /**
    * The function that will save data to the storage by a specific identifier.
    *
    * @function
    * @param {String} key
+   * @param {String | Object} value
    * @return {Promise<void>}
    */
-  setItem: (key: string, item: any) => Promise<void>;
+  setItem(key: string, value: any): void | Promise<void>;
   /**
    * The function that will remove data from storage by a specific identifier.
    *
@@ -48,5 +56,5 @@ export type StorageAdapterOptions = {
    * @param {String} key
    * @return {Promise<void>}
    */
-  removeItem: (key: string) => Promise<void>;
-};
+  removeItem(key: string): void | Promise<void>;
+}

@@ -10,30 +10,39 @@ import {
   toJS,
 } from 'mobx';
 import { StorageConfiguration } from './StorageConfiguration';
-import { PersistenceOptions } from './types';
+import { PersistenceStorageOptions, ReactionOptions } from './types';
+import { StorageAdapter } from './StorageAdapter';
 
-export class PersistStore<T> {
+export class PersistStore<T, P extends keyof T> {
   private cancelWatch: IReactionDisposer | null = null;
-  private options: PersistenceOptions | null = null;
+  private properties: string[] = [];
+  private reactionOptions: ReactionOptions | null = null;
+  private storageAdapter: StorageAdapter | null = null;
   private target: T | null = null;
 
   public isHydrated = false;
   public isPersisting = false;
+  public readonly storageName: string = '';
 
-  constructor(options: PersistenceOptions, target: T) {
-    this.options = options;
+  constructor(target: T, options: PersistenceStorageOptions<P>, reactionOptions: ReactionOptions | null = null) {
+    const { name, properties, ...storageAdapterProps } = options;
+
     this.target = target;
+    this.storageName = name;
+    this.properties = properties as string[];
+    this.storageAdapter = new StorageAdapter(storageAdapterProps);
+    this.reactionOptions = reactionOptions;
 
     makeObservable(
       this,
       {
-        clearPersist: action,
-        disposePersist: action,
+        clearPersistedStore: action,
+        hydrateStore: action,
         isHydrated: observable,
         isPersisting: observable,
-        rehydrateStore: action,
-        startPersist: action,
-        stopPersist: action,
+        pausePersisting: action,
+        startPersisting: action,
+        stopPersisting: action,
       },
       { autoBind: true, deep: false },
     );
@@ -42,30 +51,29 @@ export class PersistStore<T> {
   }
 
   private async init() {
-    await this.rehydrateStore();
-    this.startPersist();
+    await this.hydrateStore();
+    this.startPersisting();
   }
 
-  public async rehydrateStore(): Promise<void> {
+  public async hydrateStore(): Promise<void> {
     // If the user calls stopPersist and then rehydrateStore we don't want to automatically call startPersist below
     const isBeingWatched = Boolean(this.cancelWatch);
 
-    this.stopPersist();
+    this.pausePersisting();
 
     runInAction(() => {
       this.isHydrated = false;
     });
 
-    if (this.options && this.target) {
-      const data: Record<string, unknown> | undefined = await this.options.adapter.getItem(this.options.name);
+    if (this.storageAdapter && this.target) {
+      const data: Record<string, unknown> | undefined = await this.storageAdapter.getItem(this.storageName);
 
-      // Reassigning so TypeScript doesn't complain (Object is possibly 'null') about this.config and this.target within forEach
-      const { properties } = this.options;
+      // Reassigning so TypeScript doesn't complain (Object is possibly 'null') about this.target within forEach
       const target: any = this.target;
 
       if (data) {
         runInAction(() => {
-          properties.forEach((propertyName: string) => {
+          this.properties.forEach((propertyName: string) => {
             const allowPropertyHydration = [
               target.hasOwnProperty(propertyName),
               typeof data[propertyName] !== 'undefined',
@@ -84,24 +92,23 @@ export class PersistStore<T> {
     });
 
     if (isBeingWatched) {
-      this.startPersist();
+      this.startPersisting();
     }
   }
 
-  public startPersist(): void {
-    if (!this.options || !this.target || this.cancelWatch) {
+  public startPersisting(): void {
+    if (!this.storageAdapter || !this.target || this.cancelWatch) {
       return;
     }
 
-    // Reassigning so TypeScript doesn't complain (Object is possibly 'null') about this.config and this.target within reaction
-    const { properties, adapter, name } = this.options;
+    // Reassigning so TypeScript doesn't complain (Object is possibly 'null') about and this.target within reaction
     const target: any = this.target;
 
     this.cancelWatch = reaction(
       () => {
         const propertiesToWatch: Record<string, unknown> = {};
 
-        properties.forEach((propertyName: string) => {
+        this.properties.forEach((propertyName: string) => {
           const isComputedProperty = isComputedProp(target, String(propertyName));
           const isActionProperty = isAction(target[propertyName]);
 
@@ -119,14 +126,17 @@ export class PersistStore<T> {
         return propertiesToWatch;
       },
       async (dataToSave) => {
-        await adapter.setItem(name, dataToSave);
+        if (this.storageAdapter) {
+          await this.storageAdapter.setItem(this.storageName, dataToSave);
+        }
       },
+      { delay: this.reactionOptions?.delay },
     );
 
     this.isPersisting = true;
   }
 
-  public stopPersist(): void {
+  public pausePersisting(): void {
     this.isPersisting = false;
 
     if (this.cancelWatch) {
@@ -135,19 +145,21 @@ export class PersistStore<T> {
     }
   }
 
-  public async clearPersist(): Promise<void> {
-    if (this.options?.adapter) {
-      await this.options.adapter.setItem(this.options.name, {});
+  public async clearPersistedStore(): Promise<void> {
+    if (this.storageAdapter) {
+      await this.storageAdapter.removeItem(this.storageName);
     }
   }
 
-  public disposePersist(): void {
-    this.stopPersist();
+  public stopPersisting(): void {
+    this.pausePersisting();
 
     StorageConfiguration.delete(this.target);
 
     this.cancelWatch = null;
-    this.options = null;
+    this.properties = [];
+    this.reactionOptions = null;
+    this.storageAdapter = null;
     this.target = null;
   }
 }
