@@ -1,5 +1,6 @@
 import { IReactionOptions } from 'mobx';
-import { StorageAdapter } from './StorageAdapter';
+
+export type MobxPersistStoreConfig = ReactionOptions & StorageOptions;
 
 export interface PersistenceStorageOptions<P> extends StorageOptions {
   properties: P[];
@@ -28,7 +29,7 @@ export interface StorageOptions {
   /**
    *
    */
-  storage: StorageController | undefined;
+  storage?: StorageController;
 }
 
 export interface StorageController {

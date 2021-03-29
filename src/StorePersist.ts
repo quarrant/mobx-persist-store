@@ -12,6 +12,8 @@ import {
 import { StorageConfiguration } from './StorageConfiguration';
 import { PersistenceStorageOptions, ReactionOptions } from './types';
 import { StorageAdapter } from './StorageAdapter';
+import { mpsConfig } from './configure';
+import { isDefined, isObjectWithProperties } from './utils';
 
 export class StorePersist<T, P extends keyof T> {
   private cancelWatch: IReactionDisposer | null = null;
@@ -25,13 +27,18 @@ export class StorePersist<T, P extends keyof T> {
   public readonly storageName: string = '';
 
   constructor(target: T, options: PersistenceStorageOptions<P>, reactionOptions: ReactionOptions | null = null) {
-    const { name, properties, ...storageAdapterProps } = options;
-
     this.target = target;
-    this.storageName = name;
-    this.properties = properties as string[];
-    this.storageAdapter = new StorageAdapter(storageAdapterProps);
-    this.reactionOptions = reactionOptions;
+    this.storageName = options.name;
+    this.properties = options.properties as string[];
+    this.reactionOptions = isObjectWithProperties(reactionOptions) ? reactionOptions : { delay: mpsConfig.delay };
+    this.storageAdapter = new StorageAdapter({
+      expireIn: isDefined(options.expireIn) ? options.expireIn : mpsConfig.expireIn,
+      removeOnExpiration: isDefined(options.removeOnExpiration)
+        ? options.removeOnExpiration
+        : mpsConfig.removeOnExpiration,
+      stringify: isDefined(options.stringify) ? options.stringify : mpsConfig.stringify,
+      storage: isDefined(options.storage) ? options.storage : mpsConfig.storage,
+    });
 
     makeObservable(
       this,
