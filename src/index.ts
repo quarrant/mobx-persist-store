@@ -1,4 +1,5 @@
 export * from './clearPersistedStore';
+export * from './configurePersistable';
 export * from './hydrateStore';
 export * from './isHydrated';
 export * from './isPersisting';

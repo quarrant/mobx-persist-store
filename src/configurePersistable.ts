@@ -2,6 +2,6 @@ import { MobxPersistStoreConfig } from './types';
 
 export let mpsConfig: Readonly<MobxPersistStoreConfig> = {};
 
-export const configure = (config: MobxPersistStoreConfig) => {
+export const configurePersistable = (config: MobxPersistStoreConfig) => {
   mpsConfig = config;
 };

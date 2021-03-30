@@ -12,7 +12,7 @@ import {
 import { StorageConfiguration } from './StorageConfiguration';
 import { PersistenceStorageOptions, ReactionOptions } from './types';
 import { StorageAdapter } from './StorageAdapter';
-import { mpsConfig } from './configure';
+import { mpsConfig } from './configurePersistable';
 import { isDefined, isObjectWithProperties } from './utils';
 
 export class StorePersist<T, P extends keyof T> {
@@ -53,6 +53,12 @@ export class StorePersist<T, P extends keyof T> {
       },
       { autoBind: true, deep: false },
     );
+
+    if (isObjectWithProperties(this.storageAdapter.options.storage) && process.env.NODE_ENV !== 'production') {
+      console.warn(
+        `mobx-persist-store: ${this.storageName} does not have a valid storage adaptor and data will not be persisted. Please set "storage:" `,
+      );
+    }
 
     this.init();
   }

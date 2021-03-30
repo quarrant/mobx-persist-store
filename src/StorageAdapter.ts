@@ -2,7 +2,7 @@ import { StorageOptions } from './types';
 import { buildExpireTimestamp, hasTimestampExpired } from './utils';
 
 export class StorageAdapter {
-  private readonly options: StorageOptions;
+  public readonly options: StorageOptions;
 
   constructor(options: StorageOptions) {
     this.options = options;
