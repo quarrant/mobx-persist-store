@@ -36,7 +36,7 @@ describe('StorePersist', () => {
   });
 
   describe('storageAdapter', () => {
-    test(`should be all undefined `, async () => {
+    test(`should be all undefined `, () => {
       const storePersist = new StorePersist(target, { name: 'myStoreUndefined', properties: ['list'] });
 
       expect(storePersist['storageAdapter']).toEqual({
@@ -53,7 +53,7 @@ describe('StorePersist', () => {
       );
     });
 
-    test(`should be all set`, async () => {
+    test(`should be all set`, () => {
       const storePersist = new StorePersist(
         target,
         {
@@ -68,7 +68,7 @@ describe('StorePersist', () => {
       expect(storePersist['reactionOptions']).toEqual(reactionOptions);
     });
 
-    test(`should be all set from configurePersistable`, async () => {
+    test(`should be all set from configurePersistable`, () => {
       configurePersistable({
         ...persistenceStorageOptions,
         ...reactionOptions,
@@ -79,7 +79,7 @@ describe('StorePersist', () => {
       expect(storePersist['reactionOptions']).toEqual(reactionOptions);
     });
 
-    test(`should override options from configurePersistable`, async () => {
+    test(`should override options from configurePersistable`, () => {
       configurePersistable({
         ...persistenceStorageOptions,
         ...reactionOptions,

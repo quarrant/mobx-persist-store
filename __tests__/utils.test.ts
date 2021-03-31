@@ -41,29 +41,31 @@ describe('hasTimestampExpired', () => {
   });
 });
 
-describe('isDefined', () => {
-  test('returns false if value is null or undefined, otherwise true', () => {
-    expect(isDefined(undefined)).toBe(false);
-    expect(isDefined(null)).toBe(false);
-    expect(isDefined(NaN)).toBe(true);
-    expect(isDefined(0)).toBe(true);
-    expect(isDefined(false)).toBe(true);
-    expect(isDefined('')).toBe(true);
+describe('Testing Utils', () => {
+  describe('isDefined', () => {
+    test('returns false if value is null or undefined, otherwise true', () => {
+      expect(isDefined(undefined)).toBe(false);
+      expect(isDefined(null)).toBe(false);
+      expect(isDefined(NaN)).toBe(true);
+      expect(isDefined(0)).toBe(true);
+      expect(isDefined(false)).toBe(true);
+      expect(isDefined('')).toBe(true);
+    });
   });
-});
 
-test('Util.isObject', () => {
-  expect(isObject(undefined)).toBeFalsy();
-  expect(isObject(null)).toBeFalsy();
-  expect(isObject(1)).toBeFalsy();
-  expect(isObject('string')).toBeFalsy();
-  expect(isObject([])).toBeFalsy();
+  test('Util.isObject', () => {
+    expect(isObject(undefined)).toBeFalsy();
+    expect(isObject(null)).toBeFalsy();
+    expect(isObject(1)).toBeFalsy();
+    expect(isObject('string')).toBeFalsy();
+    expect(isObject([])).toBeFalsy();
 
-  expect(isObject({})).toBeTruthy();
-  expect(isObject({ hey: 'there' })).toBeTruthy();
-});
+    expect(isObject({})).toBeTruthy();
+    expect(isObject({ hey: 'there' })).toBeTruthy();
+  });
 
-test('isObjectWithProperties', () => {
-  expect(isObjectWithProperties({})).toBeFalsy();
-  expect(isObjectWithProperties({ hey: 'there' })).toBeTruthy();
+  test('isObjectWithProperties', () => {
+    expect(isObjectWithProperties({})).toBeFalsy();
+    expect(isObjectWithProperties({ hey: 'there' })).toBeTruthy();
+  });
 });
