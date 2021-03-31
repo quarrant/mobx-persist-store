@@ -1,5 +1,5 @@
 import ms from 'milliseconds';
-import { StorageOptions, StorePersist } from '../src';
+import { ReactionOptions, StorageOptions, StorePersist } from '../src';
 import { makeObservable, observable } from 'mobx';
 import { configurePersistable } from '../src';
 import mockConsole from 'jest-mock-console';
@@ -20,7 +20,7 @@ describe('StorePersist', () => {
     stringify: false,
     storage: localStorage,
   };
-  const reactionOptions = {
+  const reactionOptions: ReactionOptions = {
     delay: 200,
   };
   let restoreConsole: ReturnType<typeof mockConsole>;
