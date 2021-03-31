@@ -13,7 +13,7 @@ class MyStore {
 }
 
 describe('StorePersist', () => {
-  const target = new MyStore();
+  const myStore = new MyStore();
   const persistenceStorageOptions: StorageOptions = {
     expireIn: ms.days(7),
     removeOnExpiration: false,
@@ -37,7 +37,7 @@ describe('StorePersist', () => {
 
   describe('storageAdapter', () => {
     test(`should be all undefined `, () => {
-      const storePersist = new StorePersist(target, { name: 'myStoreUndefined', properties: ['list'] });
+      const storePersist = new StorePersist(myStore, { name: 'myStoreUndefined', properties: ['list'] });
 
       expect(storePersist['storageAdapter']).toEqual({
         options: {
@@ -55,7 +55,7 @@ describe('StorePersist', () => {
 
     test(`should be all set`, () => {
       const storePersist = new StorePersist(
-        target,
+        myStore,
         {
           name: 'myStoreSet',
           properties: ['list'],
@@ -73,7 +73,7 @@ describe('StorePersist', () => {
         ...persistenceStorageOptions,
         ...reactionOptions,
       });
-      const storePersist = new StorePersist(target, { name: 'myStoreConfigurePersistable', properties: ['list'] });
+      const storePersist = new StorePersist(myStore, { name: 'myStoreConfigurePersistable', properties: ['list'] });
 
       expect(storePersist['storageAdapter']).toEqual({ options: persistenceStorageOptions });
       expect(storePersist['reactionOptions']).toEqual(reactionOptions);
@@ -91,7 +91,7 @@ describe('StorePersist', () => {
         removeItem: (key: string) => {},
       };
       const storePersist = new StorePersist(
-        target,
+        myStore,
         {
           name: 'myStoreOverride',
           properties: ['list'],
