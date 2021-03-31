@@ -51,12 +51,12 @@ export class StorePersist<T, P extends keyof T> {
         startPersisting: action,
         stopPersisting: action,
       },
-      { autoBind: true, deep: false },
+      { autoBind: true, deep: false }
     );
 
     if (!isObject(this.storageAdapter.options.storage) && process.env.NODE_ENV !== 'production') {
       console.warn(
-        `mobx-persist-store: ${this.storageName} does not have a valid storage adaptor and data will not be persisted. Please set "storage:" `,
+        `mobx-persist-store: ${this.storageName} does not have a valid storage adaptor and data will not be persisted. Please set "storage:" `
       );
     }
 
@@ -143,7 +143,7 @@ export class StorePersist<T, P extends keyof T> {
           await this.storageAdapter.setItem(this.storageName, dataToSave);
         }
       },
-      { delay: this.reactionOptions?.delay },
+      { delay: this.reactionOptions?.delay }
     );
 
     this.isPersisting = true;

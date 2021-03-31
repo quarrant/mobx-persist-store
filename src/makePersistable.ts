@@ -5,7 +5,7 @@ import { StorageConfiguration } from './StorageConfiguration';
 export const makePersistable = <T extends { [key: string]: any }, P extends keyof T>(
   target: T,
   storageOptions: PersistenceStorageOptions<P>,
-  reactionOptions?: ReactionOptions,
+  reactionOptions?: ReactionOptions
 ): StorePersist<T, P> => {
   const mobxPersistStore = new StorePersist(target, storageOptions, reactionOptions);
 

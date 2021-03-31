@@ -30,7 +30,7 @@ export class StorageAdapter {
     try {
       parsedData = JSON.parse(data as string) || {};
     } catch (error) {
-      parsedData = (data as T) || {};
+      parsedData = (data as T) || ({} as T);
     }
 
     const hasExpired = hasTimestampExpired(parsedData.__mps__?.expireInTimestamp);

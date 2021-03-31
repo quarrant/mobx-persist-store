@@ -3,18 +3,13 @@ import { IReactionOptions } from 'mobx';
 export type MobxPersistStoreConfig = ReactionOptions & StorageOptions;
 
 export interface PersistenceStorageOptions<P> extends StorageOptions {
-  properties: P[];
   name: string;
+  properties: P[];
 }
 
 export type ReactionOptions = Pick<IReactionOptions, 'delay'>;
 
 export interface StorageOptions {
-  /**
-   * @property {Boolean} [jsonify] When true the data will be JSON.stringify before being passed to setItem. The default value is true.
-   * @default true
-   */
-  stringify?: boolean;
   /**
    * @property {Number} [expireIn] A value in milliseconds to determine when the data in storage should not be retrieved by getItem.
    *
@@ -30,6 +25,11 @@ export interface StorageOptions {
    *
    */
   storage?: StorageController;
+  /**
+   * @property {Boolean} [jsonify] When true the data will be JSON.stringify before being passed to setItem. The default value is true.
+   * @default true
+   */
+  stringify?: boolean;
 }
 
 export interface StorageController {
@@ -42,6 +42,14 @@ export interface StorageController {
    */
   getItem<T>(key: string): T | string | null | Promise<T | string | null>;
   /**
+   * The function that will remove data from storage by a specific identifier.
+   *
+   * @function
+   * @param {String} key
+   * @return {Promise<void>}
+   */
+  removeItem(key: string): void | Promise<void>;
+  /**
    * The function that will save data to the storage by a specific identifier.
    *
    * @function
@@ -50,12 +58,4 @@ export interface StorageController {
    * @return {Promise<void>}
    */
   setItem(key: string, value: any): void | Promise<void>;
-  /**
-   * The function that will remove data from storage by a specific identifier.
-   *
-   * @function
-   * @param {String} key
-   * @return {Promise<void>}
-   */
-  removeItem(key: string): void | Promise<void>;
 }
