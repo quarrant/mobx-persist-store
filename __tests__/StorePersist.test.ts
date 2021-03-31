@@ -107,6 +107,7 @@ describe('StorePersist', () => {
         options: { expireIn: ms.hours(7), removeOnExpiration: true, stringify: true, storage: storage },
       });
       expect(storePersist['reactionOptions']).toEqual({ delay: 300 });
+      expect(storePersist['storageAdapter']?.options.storage).toBe(storage);
     });
   });
 });
