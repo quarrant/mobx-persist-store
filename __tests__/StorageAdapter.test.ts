@@ -162,7 +162,12 @@ describe('StorageAdapter', () => {
         await storageAdapter.setItem('mockStore', mockStore);
 
         const actualResult = await storageAdapter.getItem('mockStore');
-        const expectedResult = mockStore;
+        const expectedResult = {
+          ...mockStore,
+          __mps__: {
+            expireInTimestamp: testStorage['mockStore'].__mps__.expireInTimestamp,
+          },
+        };
 
         expect(actualResult).toEqual(expectedResult);
       });
@@ -238,7 +243,12 @@ describe('StorageAdapter', () => {
         await storageAdapter.getItem('mockStore');
 
         const actualResult = testStorage['mockStore'];
-        const expectedResult = mockStore;
+        const expectedResult = {
+          ...mockStore,
+          __mps__: {
+            expireInTimestamp: testStorage['mockStore'].__mps__.expireInTimestamp,
+          },
+        };
 
         expect(actualResult).toEqual(expectedResult);
       });

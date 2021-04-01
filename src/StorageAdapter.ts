@@ -11,7 +11,7 @@ export class StorageAdapter {
   async setItem<T extends Record<string, unknown>>(key: string, item: T): Promise<void> {
     const { stringify = true, expireIn } = this.options;
     const data: T = expireIn
-      ? Object.assign(item, {
+      ? Object.assign({}, item, {
           __mps__: {
             expireInTimestamp: buildExpireTimestamp(expireIn),
           },

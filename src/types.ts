@@ -1,13 +1,13 @@
 import { IReactionOptions } from 'mobx';
 
+export type ReactionOptions = IReactionOptions;
+
 export type MobxPersistStoreConfig = ReactionOptions & StorageOptions;
 
 export interface PersistenceStorageOptions<P> extends StorageOptions {
   name: string;
   properties: P[];
 }
-
-export type ReactionOptions = Pick<IReactionOptions, 'delay'>;
 
 export interface StorageOptions {
   /**

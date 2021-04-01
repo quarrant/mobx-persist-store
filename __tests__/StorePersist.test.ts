@@ -22,6 +22,7 @@ describe('StorePersist', () => {
   };
   const reactionOptions: ReactionOptions = {
     delay: 200,
+    fireImmediately: false,
   };
   let restoreConsole: ReturnType<typeof mockConsole>;
 
@@ -47,7 +48,7 @@ describe('StorePersist', () => {
           stringify: undefined,
         },
       });
-      expect(storePersist['reactionOptions']).toEqual({ delay: undefined });
+      expect(storePersist['reactionOptions']).toEqual({ delay: undefined, fireImmediately: true });
       expect(console.warn).toHaveBeenCalledWith(
         `mobx-persist-store: myStoreUndefined does not have a valid storage adaptor and data will not be persisted. Please set "storage:" `,
       );
@@ -69,10 +70,14 @@ describe('StorePersist', () => {
     });
 
     test(`should be all set from configurePersistable`, () => {
-      configurePersistable({
-        ...persistenceStorageOptions,
-        ...reactionOptions,
-      });
+      configurePersistable(
+        {
+          ...persistenceStorageOptions,
+        },
+        {
+          ...reactionOptions,
+        },
+      );
       const storePersist = new StorePersist(myStore, { name: 'myStoreConfigurePersistable', properties: ['list'] });
 
       expect(storePersist['storageAdapter']).toEqual({ options: persistenceStorageOptions });
@@ -80,10 +85,14 @@ describe('StorePersist', () => {
     });
 
     test(`should override options from configurePersistable`, () => {
-      configurePersistable({
-        ...persistenceStorageOptions,
-        ...reactionOptions,
-      });
+      configurePersistable(
+        {
+          ...persistenceStorageOptions,
+        },
+        {
+          ...reactionOptions,
+        },
+      );
 
       const storage = {
         setItem: (key: string, value: string) => {},
@@ -100,13 +109,13 @@ describe('StorePersist', () => {
           stringify: true,
           storage: storage,
         },
-        { delay: 300 },
+        { delay: 300, fireImmediately: true },
       );
 
       expect(storePersist['storageAdapter']).toEqual({
         options: { expireIn: ms.hours(7), removeOnExpiration: true, stringify: true, storage: storage },
       });
-      expect(storePersist['reactionOptions']).toEqual({ delay: 300 });
+      expect(storePersist['reactionOptions']).toEqual({ delay: 300, fireImmediately: true });
       expect(storePersist['storageAdapter']?.options.storage).toBe(storage);
     });
   });

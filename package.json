@@ -26,7 +26,7 @@
   "scripts": {
     "test": "jest",
     "build": "rm -rf lib && tsc",
-    "prepublishOnly": "yarn test && yarn build",
+    "prepublishOnly": "yarn build",
     "release-branch": "bash scripts/make-release-branch.sh"
   },
   "peerDependencies": {

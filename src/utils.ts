@@ -24,3 +24,14 @@ export const isObject = (data: any): boolean => {
 export const isObjectWithProperties = (data: any): boolean => {
   return isObject(data) && Object.keys(data).length > 0;
 };
+
+const isBrowser = typeof window !== 'undefined';
+const isNotProductionBuild = process.env.NODE_ENV !== 'production';
+
+export const invalidStorageAdaptorWarningIf = (invalidStorageAdaptor: boolean, storageName: string): void => {
+  if (invalidStorageAdaptor && isBrowser && isNotProductionBuild) {
+    console.warn(
+      `mobx-persist-store: ${storageName} does not have a valid storage adaptor and data will not be persisted. Please set "storage:" `
+    );
+  }
+};

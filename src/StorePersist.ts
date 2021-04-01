@@ -12,13 +12,13 @@ import {
 import { StorageConfiguration } from './StorageConfiguration';
 import { PersistenceStorageOptions, ReactionOptions } from './types';
 import { StorageAdapter } from './StorageAdapter';
-import { mpsConfig } from './configurePersistable';
-import { isDefined, isObject, isObjectWithProperties } from './utils';
+import { mpsConfig, mpsReactionOptions } from './configurePersistable';
+import { invalidStorageAdaptorWarningIf, isDefined, isObject } from './utils';
 
 export class StorePersist<T, P extends keyof T> {
   private cancelWatch: IReactionDisposer | null = null;
   private properties: string[] = [];
-  private reactionOptions: ReactionOptions | null = null;
+  private reactionOptions: ReactionOptions = {};
   private storageAdapter: StorageAdapter | null = null;
   private target: T | null = null;
 
@@ -26,11 +26,11 @@ export class StorePersist<T, P extends keyof T> {
   public isPersisting = false;
   public readonly storageName: string = '';
 
-  constructor(target: T, options: PersistenceStorageOptions<P>, reactionOptions: ReactionOptions | null = null) {
+  constructor(target: T, options: PersistenceStorageOptions<P>, reactionOptions: ReactionOptions = {}) {
     this.target = target;
     this.storageName = options.name;
     this.properties = options.properties as string[];
-    this.reactionOptions = isObjectWithProperties(reactionOptions) ? reactionOptions : { delay: mpsConfig.delay };
+    this.reactionOptions = Object.assign({ fireImmediately: true }, mpsReactionOptions, reactionOptions);
     this.storageAdapter = new StorageAdapter({
       expireIn: isDefined(options.expireIn) ? options.expireIn : mpsConfig.expireIn,
       removeOnExpiration: isDefined(options.removeOnExpiration)
@@ -51,14 +51,10 @@ export class StorePersist<T, P extends keyof T> {
         startPersisting: action,
         stopPersisting: action,
       },
-      { autoBind: true, deep: false }
+      { autoBind: true, deep: false },
     );
 
-    if (!isObject(this.storageAdapter.options.storage) && process.env.NODE_ENV !== 'production') {
-      console.warn(
-        `mobx-persist-store: ${this.storageName} does not have a valid storage adaptor and data will not be persisted. Please set "storage:" `
-      );
-    }
+    invalidStorageAdaptorWarningIf(!isObject(this.storageAdapter.options.storage), this.storageName);
 
     this.init();
   }
@@ -143,7 +139,7 @@ export class StorePersist<T, P extends keyof T> {
           await this.storageAdapter.setItem(this.storageName, dataToSave);
         }
       },
-      { delay: this.reactionOptions?.delay }
+      this.reactionOptions,
     );
 
     this.isPersisting = true;
@@ -171,7 +167,7 @@ export class StorePersist<T, P extends keyof T> {
 
     this.cancelWatch = null;
     this.properties = [];
-    this.reactionOptions = null;
+    this.reactionOptions = {};
     this.storageAdapter = null;
     this.target = null;
   }
