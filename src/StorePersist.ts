@@ -13,7 +13,13 @@ import { StorageConfiguration } from './StorageConfiguration';
 import { PersistenceStorageOptions, ReactionOptions } from './types';
 import { StorageAdapter } from './StorageAdapter';
 import { mpsConfig, mpsReactionOptions } from './configurePersistable';
-import { invalidStorageAdaptorWarningIf, isDefined, isObject } from './utils';
+import {
+  actionPersistWarningIf,
+  computedPersistWarningIf,
+  invalidStorageAdaptorWarningIf,
+  isDefined,
+  isObject,
+} from './utils';
 
 export class StorePersist<T, P extends keyof T> {
   private cancelWatch: IReactionDisposer | null = null;
@@ -121,11 +127,8 @@ export class StorePersist<T, P extends keyof T> {
           const isComputedProperty = isComputedProp(target, String(propertyName));
           const isActionProperty = isAction(target[propertyName]);
 
-          if (isComputedProperty) {
-            console.warn(`The property '${propertyName}'  is computed and will not persist.`);
-          } else if (isActionProperty) {
-            console.warn(`The property '${propertyName}'  is an action and will not persist.`);
-          }
+          computedPersistWarningIf(isComputedProperty, propertyName);
+          actionPersistWarningIf(isActionProperty, propertyName);
 
           if (!isComputedProperty && !isActionProperty) {
             propertiesToWatch[propertyName] = toJS(target[propertyName]);

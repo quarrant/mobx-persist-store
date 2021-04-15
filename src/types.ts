@@ -2,14 +2,17 @@ import { IReactionOptions } from 'mobx';
 
 export type ReactionOptions = IReactionOptions;
 
-export type MobxPersistStoreConfig = ReactionOptions & StorageOptions;
-
 export interface PersistenceStorageOptions<P> extends StorageOptions {
   name: string;
   properties: P[];
 }
 
 export interface StorageOptions {
+  /**
+   * @property {Boolean} [debug] When true console.info when getItem, setItem or removeItem are triggered.
+   * @default false
+   */
+  debug?: boolean;
   /**
    * @property {Number} [expireIn] A value in milliseconds to determine when the data in storage should not be retrieved by getItem.
    *
