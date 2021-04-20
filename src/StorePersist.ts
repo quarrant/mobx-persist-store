@@ -16,6 +16,7 @@ import { mpsConfig, mpsReactionOptions } from './configurePersistable';
 import {
   actionPersistWarningIf,
   computedPersistWarningIf,
+  consoleDebug,
   invalidStorageAdaptorWarningIf,
   isDefined,
   isObject,
@@ -37,13 +38,12 @@ export class StorePersist<T, P extends keyof T> {
     this.storageName = options.name;
     this.properties = options.properties as string[];
     this.reactionOptions = Object.assign({ fireImmediately: true }, mpsReactionOptions, reactionOptions);
+
     this.storageAdapter = new StorageAdapter({
-      expireIn: isDefined(options.expireIn) ? options.expireIn : mpsConfig.expireIn,
-      removeOnExpiration: isDefined(options.removeOnExpiration)
-        ? options.removeOnExpiration
-        : mpsConfig.removeOnExpiration,
-      stringify: isDefined(options.stringify) ? options.stringify : mpsConfig.stringify,
-      storage: isDefined(options.storage) ? options.storage : mpsConfig.storage,
+      expireIn: options.expireIn ?? mpsConfig.expireIn,
+      removeOnExpiration: options.removeOnExpiration ?? mpsConfig.removeOnExpiration ?? true,
+      stringify: options.stringify ?? mpsConfig.stringify ?? true,
+      storage: options.storage ? options.storage : mpsConfig.storage,
     });
 
     makeObservable(
@@ -57,10 +57,16 @@ export class StorePersist<T, P extends keyof T> {
         startPersisting: action,
         stopPersisting: action,
       },
-      { autoBind: true, deep: false },
+      { autoBind: true, deep: false }
     );
 
     invalidStorageAdaptorWarningIf(!isObject(this.storageAdapter.options.storage), this.storageName);
+
+    consoleDebug(`${this.storageName} - (makePersistable)`, {
+      properties: this.properties,
+      storageAdapter: this.storageAdapter,
+      reactionOptions: this.reactionOptions,
+    });
 
     this.init();
   }
@@ -74,10 +80,13 @@ export class StorePersist<T, P extends keyof T> {
     // If the user calls stopPersist and then rehydrateStore we don't want to automatically call startPersist below
     const isBeingWatched = Boolean(this.cancelWatch);
 
-    this.pausePersisting();
+    if (this.isPersisting) {
+      this.pausePersisting();
+    }
 
     runInAction(() => {
       this.isHydrated = false;
+      consoleDebug(`${this.storageName} - (hydrateStore) isHydrated:`, this.isHydrated);
     });
 
     if (this.storageAdapter && this.target) {
@@ -104,6 +113,7 @@ export class StorePersist<T, P extends keyof T> {
 
     runInAction(() => {
       this.isHydrated = true;
+      consoleDebug(`${this.storageName} - isHydrated:`, this.isHydrated);
     });
 
     if (isBeingWatched) {
@@ -142,14 +152,18 @@ export class StorePersist<T, P extends keyof T> {
           await this.storageAdapter.setItem(this.storageName, dataToSave);
         }
       },
-      this.reactionOptions,
+      this.reactionOptions
     );
 
     this.isPersisting = true;
+
+    consoleDebug(`${this.storageName} - (startPersisting) isPersisting:`, this.isPersisting);
   }
 
   public pausePersisting(): void {
     this.isPersisting = false;
+
+    consoleDebug(`${this.storageName} - pausePersisting (isPersisting):`, this.isPersisting);
 
     if (this.cancelWatch) {
       this.cancelWatch();
@@ -165,6 +179,8 @@ export class StorePersist<T, P extends keyof T> {
 
   public stopPersisting(): void {
     this.pausePersisting();
+
+    consoleDebug(`${this.storageName} - (stopPersisting)`);
 
     StorageConfiguration.delete(this.target);
 

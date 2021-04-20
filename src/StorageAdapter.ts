@@ -9,11 +9,11 @@ export class StorageAdapter {
   }
 
   async setItem<T extends Record<string, unknown>>(key: string, item: T): Promise<void> {
-    const { stringify = true, expireIn } = this.options;
-    const data: T = expireIn
+    const { stringify = true } = this.options;
+    const data: T = this.options.expireIn
       ? Object.assign({}, item, {
           __mps__: {
-            expireInTimestamp: buildExpireTimestamp(expireIn),
+            expireInTimestamp: buildExpireTimestamp(this.options.expireIn),
           },
         })
       : item;
@@ -37,7 +37,7 @@ export class StorageAdapter {
 
     const hasExpired = hasTimestampExpired(parsedData.__mps__?.expireInTimestamp);
 
-    consoleDebug(`${key} - hasExpired:`, hasExpired);
+    consoleDebug(`${key} - hasExpired`, hasExpired);
 
     if (hasExpired && removeOnExpiration) {
       await this.removeItem(key);
@@ -45,13 +45,13 @@ export class StorageAdapter {
 
     parsedData = hasExpired ? ({} as T) : parsedData;
 
-    consoleDebug(`${key} - getItem:`, parsedData);
+    consoleDebug(`${key} - (getItem):`, parsedData);
 
     return parsedData;
   }
 
   async removeItem(key: string): Promise<void> {
-    consoleDebug(`${key} - removeItem: storage was removed`);
+    consoleDebug(`${key} - (removeItem): storage was removed`);
 
     await this.options.storage?.removeItem(key);
   }

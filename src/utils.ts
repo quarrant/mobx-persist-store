@@ -59,7 +59,7 @@ export const actionPersistWarningIf = (isComputedProperty: boolean, propertyName
 };
 
 export const consoleDebug = (message: string, content: any = ''): void => {
-  if (mpsConfig.debug && isNotProductionBuild) {
+  if (mpsConfig.debug && isBrowser && isNotProductionBuild) {
     console.info(
       `%c mobx-persist-store: (Debug Mode) ${message} `,
       'background: #4B8CC5; color: black; display: block;',

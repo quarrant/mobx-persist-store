@@ -37,15 +37,15 @@ describe('StorePersist', () => {
   });
 
   describe('storageAdapter', () => {
-    test(`should be all undefined `, () => {
+    test(`should have default values`, () => {
       const storePersist = new StorePersist(myStore, { name: 'myStoreUndefined', properties: ['list'] });
 
       expect(storePersist['storageAdapter']).toEqual({
         options: {
           expireIn: undefined,
-          removeOnExpiration: undefined,
+          removeOnExpiration: true,
           storage: undefined,
-          stringify: undefined,
+          stringify: true,
         },
       });
       expect(storePersist['reactionOptions']).toEqual({ delay: undefined, fireImmediately: true });

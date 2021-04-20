@@ -1,21 +1,19 @@
 import ms from 'milliseconds';
-import { configurePersistable, mpsConfig } from '../lib';
+import { mpsConfig, mpsReactionOptions, StorageOptions, configurePersistable, ReactionOptions } from '../src';
 
 describe('configurePersistable', () => {
-  const config = {
+  const config: StorageOptions = {
     expireIn: ms.days(7),
     removeOnExpiration: false,
     stringify: false,
     storage: localStorage,
-    delay: 200,
   };
+  const reactionOptions: ReactionOptions = { delay: 200 };
 
   test(`should set global config`, () => {
-    configurePersistable(config);
+    configurePersistable(config, reactionOptions);
 
-    const actualResult = mpsConfig;
-    const expectedResult = config;
-
-    expect(actualResult).toBe(expectedResult);
+    expect(config).toBe(mpsConfig);
+    expect(reactionOptions).toBe(mpsReactionOptions);
   });
 });
