@@ -18,7 +18,6 @@ import {
   computedPersistWarningIf,
   consoleDebug,
   invalidStorageAdaptorWarningIf,
-  isDefined,
   isObject,
 } from './utils';
 
@@ -38,7 +37,6 @@ export class StorePersist<T, P extends keyof T> {
     this.storageName = options.name;
     this.properties = options.properties as string[];
     this.reactionOptions = Object.assign({ fireImmediately: true }, mpsReactionOptions, reactionOptions);
-
     this.storageAdapter = new StorageAdapter({
       expireIn: options.expireIn ?? mpsConfig.expireIn,
       removeOnExpiration: options.removeOnExpiration ?? mpsConfig.removeOnExpiration ?? true,
@@ -173,6 +171,8 @@ export class StorePersist<T, P extends keyof T> {
 
   public async clearPersistedStore(): Promise<void> {
     if (this.storageAdapter) {
+      consoleDebug(`${this.storageName} - (clearPersistedStore)`);
+
       await this.storageAdapter.removeItem(this.storageName);
     }
   }
