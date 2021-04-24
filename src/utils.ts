@@ -1,4 +1,5 @@
 import { mpsConfig } from './configurePersistable';
+import { StorageController } from './types';
 
 export const buildExpireTimestamp = (milliseconds: number): number => {
   return new Date().getTime() + milliseconds;
@@ -27,43 +28,62 @@ export const isObjectWithProperties = (data: any): boolean => {
   return isObject(data) && Object.keys(data).length > 0;
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const isFunction = (functionToCheck: any): boolean => {
+  return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+};
+
+export const isStorageAdaptorLike = (value: StorageController | undefined): value is StorageController => {
+  return [
+    value?.hasOwnProperty('getItem'),
+    value?.hasOwnProperty('removeItem'),
+    value?.hasOwnProperty('setItem'),
+    isFunction(value?.getItem),
+    isFunction(value?.removeItem),
+    isFunction(value?.setItem),
+  ].every(Boolean);
+};
+
 const isBrowser = typeof window !== 'undefined';
 const isNotProductionBuild = process.env.NODE_ENV !== 'production';
 
-export const invalidStorageAdaptorWarningIf = (invalidStorageAdaptor: boolean, storageName: string): void => {
-  if (invalidStorageAdaptor && isBrowser && isNotProductionBuild) {
+export const invalidStorageAdaptorWarningIf = (
+  storageAdaptor: StorageController | undefined,
+  storageName: string,
+): void => {
+  if (isBrowser && isNotProductionBuild && !isStorageAdaptorLike(storageAdaptor)) {
     console.warn(
-      `mobx-persist-store: ${storageName} does not have a valid storage adaptor and data will not be persisted. Please set "storage:" `
+      `mobx-persist-store: ${storageName} does not have a valid storage adaptor.\n\n * Make sure the storage adapter has 'getItem', 'setItem' and 'removeItem' methods." `,
     );
   }
 };
 
 export const duplicatedStoreWarningIf = (hasPersistedStoreAlready: boolean, storageName: string): void => {
-  if (hasPersistedStoreAlready && isBrowser && isNotProductionBuild) {
+  if (isBrowser && isNotProductionBuild && hasPersistedStoreAlready) {
     console.warn(
-      `mobx-persist-store: 'makePersistable' was called was called with the same storage name "${storageName}".\n\n * Make sure you call "stopPersisting" before recreating "${storageName}" to avoid memory leaks. \n * Or double check you did not have two stores with the same name.`
+      `mobx-persist-store: 'makePersistable' was called was called with the same storage name "${storageName}".\n\n * Make sure you call "stopPersisting" before recreating "${storageName}" to avoid memory leaks. \n * Or double check you did not have two stores with the same name.`,
     );
   }
 };
 
 export const computedPersistWarningIf = (isComputedProperty: boolean, propertyName: string): void => {
-  if (isComputedProperty && isBrowser && isNotProductionBuild) {
+  if (isBrowser && isNotProductionBuild && isComputedProperty) {
     console.warn(`mobx-persist-store: The property '${propertyName}' is computed and will not persist.`);
   }
 };
 
 export const actionPersistWarningIf = (isComputedProperty: boolean, propertyName: string): void => {
-  if (isComputedProperty && isBrowser && isNotProductionBuild) {
+  if (isBrowser && isNotProductionBuild && isComputedProperty) {
     console.warn(`mobx-persist-store: The property '${propertyName}' is an action and will not persist.`);
   }
 };
 
 export const consoleDebug = (message: string, content: any = ''): void => {
-  if (mpsConfig.debug && isBrowser && isNotProductionBuild) {
+  if (isBrowser && isNotProductionBuild && mpsConfig.debug) {
     console.info(
       `%c mobx-persist-store: (Debug Mode) ${message} `,
       'background: #4B8CC5; color: black; display: block;',
-      content
+      content,
     );
   }
 };

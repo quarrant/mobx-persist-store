@@ -18,7 +18,6 @@ import {
   computedPersistWarningIf,
   consoleDebug,
   invalidStorageAdaptorWarningIf,
-  isObject,
 } from './utils';
 
 export class StorePersist<T, P extends keyof T> {
@@ -58,7 +57,7 @@ export class StorePersist<T, P extends keyof T> {
       { autoBind: true, deep: false }
     );
 
-    invalidStorageAdaptorWarningIf(!isObject(this.storageAdapter.options.storage), this.storageName);
+    invalidStorageAdaptorWarningIf(this.storageAdapter.options.storage, this.storageName);
 
     consoleDebug(`${this.storageName} - (makePersistable)`, {
       properties: this.properties,
@@ -169,14 +168,6 @@ export class StorePersist<T, P extends keyof T> {
     }
   }
 
-  public async clearPersistedStore(): Promise<void> {
-    if (this.storageAdapter) {
-      consoleDebug(`${this.storageName} - (clearPersistedStore)`);
-
-      await this.storageAdapter.removeItem(this.storageName);
-    }
-  }
-
   public stopPersisting(): void {
     this.pausePersisting();
 
@@ -189,5 +180,24 @@ export class StorePersist<T, P extends keyof T> {
     this.reactionOptions = {};
     this.storageAdapter = null;
     this.target = null;
+  }
+
+  public async clearPersistedStore(): Promise<void> {
+    if (this.storageAdapter) {
+      consoleDebug(`${this.storageName} - (clearPersistedStore)`);
+
+      await this.storageAdapter.removeItem(this.storageName);
+    }
+  }
+
+  public async getPersistedStore<T extends Record<string, any>>(): Promise<T | null> {
+    if (this.storageAdapter) {
+      consoleDebug(`${this.storageName} - (getPersistedStore)`);
+
+      // @ts-ignore
+      return this.storageAdapter.getItem(this.storageName);
+    }
+
+    return null;
   }
 }
