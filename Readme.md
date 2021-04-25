@@ -15,16 +15,22 @@
 
 - [Installation](#installation)
 - [Demo](#demo)
-- [Usage](#usage)
-  - [With Decorators](#with-decorators)
-  - [Without Decorators](#without-decorators)
-  - [With Mobx 6](#with-mobx-6)
+- [Getting Started](#getting-started)
+- [Simple Example](#simple-example)
+- [Example With All Options](#example-with-all-options)
+- [Global Configuration](#global-configuration)
 - [API](#api)
-  - [persistence](#persistence)
-  - [StorageAdapter](#storageadapter)
-  - [clearPersist](#clearpersist)
-  - [stopPersist](#stoppersist)
-  - [isSynchronized](#issynchronized)
+  - [makePersistable](#makepersistable)
+  - [StorageOptions & ReactionOptions](#storageoptions--reactionoptions)
+  - [isHydrated](#ishydrated)
+  - [isPersisting](#ispersisting)
+  - [pausePersisting](#pausepersisting)
+  - [startPersisting](#startpersisting)
+  - [stopPersisting](#stoppersisting)
+  - [hydrateStore](#hydratestore-promise)
+  - [clearPersistedStore](#clearpersistedstore-promise)
+  - [getPersistedStore](#getpersistedstore-promise)
+  - [PersistStoreMap](#persiststoremap)
 - [Links](#links)
 
 ## Installation
@@ -42,8 +48,6 @@ npm i mobx-persist-store
 
 <a href="https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark" target="_blank">Mobx Persist Store with MobX 6</a>
 <a href="https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark" target="_blank">![demo screen shot](./demo-screen-shot.png)</a>
-
-
 
 ## Getting Started
 
@@ -122,6 +126,8 @@ configurePersistable(
 makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
 ```
 
+`configurePersistable` sets items globally, but you can override them within `makePersistable`.
+
 ## API
 
 You should only need `makePersistable` but this library also provides other utils for more advance usage.
@@ -150,6 +156,7 @@ You should only need `makePersistable` but this library also provides other util
 >  - `name` (String) - should be a unique identifier and will be available within the read/write functions of the StorageAdapter.
 >  - `properties` (Array of String) - A list of observable properties on the store you want to persist. Doesn't save MobX actions or computed values.
 >  - `storage` [localStorage Like API](https://hacks.mozilla.org/2009/06/localstorage/) - facilitates the reading, writing, and removal of the persisted store data. For **ReactNative** it may be `AsyncStorage`, `FS`, etc. and for **React** - `localStorage`, `sessionStorage`, `localForage` etc.
+>     - If you have an app that is Server-side rendering (SSR) you can set the value `undefined` to prevent errors.
 >  - `expireIn` (Number) - A value in milliseconds to determine when the data in storage should not be retrieved by getItem. Never expires by default.
 >  - `removeOnExpiration` (Boolean) - If expireIn has a value and has expired, the data in storage will be removed automatically when getItem is called. The default value is true.
 >  - `stringify` (Boolean) - When true the data will be JSON.stringify before being passed to setItem. The default value is true.
@@ -405,11 +412,3 @@ You should only need `makePersistable` but this library also provides other util
 ## Links
 
 * [MobX Site](https://mobx.js.org/README.html)
-
-
-```javascript
-import { makeAutoObservable } from 'mobx';
-import { persistence, clearPersist, stopPersist, isSynchronized } from 'mobx-persist-store';
-
-storage: environment.isBrowser ? localforage : undefined,
-```
