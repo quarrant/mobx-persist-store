@@ -9,7 +9,7 @@ export class StorageAdapter {
   }
 
   async setItem<T extends Record<string, unknown>>(key: string, item: T): Promise<void> {
-    const { stringify = true, debug = false } = this.options;
+    const { stringify = true, debugMode = false } = this.options;
     const data: T = this.options.expireIn
       ? Object.assign({}, item, {
           __mps__: {
@@ -19,13 +19,13 @@ export class StorageAdapter {
       : item;
     const content = stringify ? JSON.stringify(data) : data;
 
-    consoleDebug(debug, `${key} - setItem:`, content);
+    consoleDebug(debugMode, `${key} - setItem:`, content);
 
     await this.options.storage?.setItem(key, content);
   }
 
   async getItem<T extends Record<string, any>>(key: string): Promise<T> {
-    const { removeOnExpiration = true, debug = false } = this.options;
+    const { removeOnExpiration = true, debugMode = false } = this.options;
     const storageData = await this.options.storage?.getItem(key);
     let parsedData: T;
 
@@ -37,7 +37,7 @@ export class StorageAdapter {
 
     const hasExpired = hasTimestampExpired(parsedData.__mps__?.expireInTimestamp);
 
-    consoleDebug(debug, `${key} - hasExpired`, hasExpired);
+    consoleDebug(debugMode, `${key} - hasExpired`, hasExpired);
 
     if (hasExpired && removeOnExpiration) {
       await this.removeItem(key);
@@ -45,15 +45,15 @@ export class StorageAdapter {
 
     parsedData = hasExpired ? ({} as T) : parsedData;
 
-    consoleDebug(debug, `${key} - (getItem):`, parsedData);
+    consoleDebug(debugMode, `${key} - (getItem):`, parsedData);
 
     return parsedData;
   }
 
   async removeItem(key: string): Promise<void> {
-    const { debug = false } = this.options;
+    const { debugMode = false } = this.options;
 
-    consoleDebug(debug, `${key} - (removeItem): storage was removed`);
+    consoleDebug(debugMode, `${key} - (removeItem): storage was removed`);
 
     await this.options.storage?.removeItem(key);
   }

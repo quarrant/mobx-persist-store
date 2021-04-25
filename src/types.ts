@@ -9,10 +9,10 @@ export interface PersistenceStorageOptions<P> extends StorageOptions {
 
 export interface StorageOptions {
   /**
-   * @property {Boolean} [debug] When true console.info when getItem, setItem or removeItem are triggered.
+   * @property {Boolean} [debugMode] When true console.info when getItem, setItem or removeItem are triggered.
    * @default false
    */
-  debug?: boolean;
+  debugMode?: boolean;
   /**
    * @property {Number} [expireIn] A value in milliseconds to determine when the data in storage should not be retrieved by getItem.
    *

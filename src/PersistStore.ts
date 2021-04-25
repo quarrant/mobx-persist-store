@@ -26,7 +26,7 @@ export class PersistStore<T, P extends keyof T> {
   private reactionOptions: ReactionOptions = {};
   private storageAdapter: StorageAdapter | null = null;
   private target: T | null = null;
-  private readonly debug: boolean = false;
+  private readonly debugMode: boolean = false;
 
   public isHydrated = false;
   public isPersisting = false;
@@ -37,13 +37,13 @@ export class PersistStore<T, P extends keyof T> {
     this.storageName = options.name;
     this.properties = options.properties as string[];
     this.reactionOptions = Object.assign({ fireImmediately: true }, mpsReactionOptions, reactionOptions);
-    this.debug = options.debug ?? mpsConfig.debug ?? false;
+    this.debugMode = options.debugMode ?? mpsConfig.debugMode ?? false;
     this.storageAdapter = new StorageAdapter({
       expireIn: options.expireIn ?? mpsConfig.expireIn,
       removeOnExpiration: options.removeOnExpiration ?? mpsConfig.removeOnExpiration ?? true,
       stringify: options.stringify ?? mpsConfig.stringify ?? true,
       storage: options.storage ? options.storage : mpsConfig.storage,
-      debug: this.debug,
+      debugMode: this.debugMode,
     });
 
     makeObservable(
@@ -62,7 +62,7 @@ export class PersistStore<T, P extends keyof T> {
 
     invalidStorageAdaptorWarningIf(this.storageAdapter.options.storage, this.storageName);
 
-    consoleDebug(this.debug, `${this.storageName} - (makePersistable)`, {
+    consoleDebug(this.debugMode, `${this.storageName} - (makePersistable)`, {
       properties: this.properties,
       storageAdapter: this.storageAdapter,
       reactionOptions: this.reactionOptions,
@@ -86,7 +86,7 @@ export class PersistStore<T, P extends keyof T> {
 
     runInAction(() => {
       this.isHydrated = false;
-      consoleDebug(this.debug, `${this.storageName} - (hydrateStore) isHydrated:`, this.isHydrated);
+      consoleDebug(this.debugMode, `${this.storageName} - (hydrateStore) isHydrated:`, this.isHydrated);
     });
 
     if (this.storageAdapter && this.target) {
@@ -113,7 +113,7 @@ export class PersistStore<T, P extends keyof T> {
 
     runInAction(() => {
       this.isHydrated = true;
-      consoleDebug(this.debug, `${this.storageName} - isHydrated:`, this.isHydrated);
+      consoleDebug(this.debugMode, `${this.storageName} - isHydrated:`, this.isHydrated);
     });
 
     if (isBeingWatched) {
@@ -157,13 +157,13 @@ export class PersistStore<T, P extends keyof T> {
 
     this.isPersisting = true;
 
-    consoleDebug(this.debug, `${this.storageName} - (startPersisting) isPersisting:`, this.isPersisting);
+    consoleDebug(this.debugMode, `${this.storageName} - (startPersisting) isPersisting:`, this.isPersisting);
   }
 
   public pausePersisting(): void {
     this.isPersisting = false;
 
-    consoleDebug(this.debug, `${this.storageName} - pausePersisting (isPersisting):`, this.isPersisting);
+    consoleDebug(this.debugMode, `${this.storageName} - pausePersisting (isPersisting):`, this.isPersisting);
 
     if (this.cancelWatch) {
       this.cancelWatch();
@@ -174,7 +174,7 @@ export class PersistStore<T, P extends keyof T> {
   public stopPersisting(): void {
     this.pausePersisting();
 
-    consoleDebug(this.debug, `${this.storageName} - (stopPersisting)`);
+    consoleDebug(this.debugMode, `${this.storageName} - (stopPersisting)`);
 
     PersistStoreMap.delete(this.target);
 
@@ -187,7 +187,7 @@ export class PersistStore<T, P extends keyof T> {
 
   public async clearPersistedStore(): Promise<void> {
     if (this.storageAdapter) {
-      consoleDebug(this.debug, `${this.storageName} - (clearPersistedStore)`);
+      consoleDebug(this.debugMode, `${this.storageName} - (clearPersistedStore)`);
 
       await this.storageAdapter.removeItem(this.storageName);
     }
@@ -195,7 +195,7 @@ export class PersistStore<T, P extends keyof T> {
 
   public async getPersistedStore<T extends Record<string, any>>(): Promise<T | null> {
     if (this.storageAdapter) {
-      consoleDebug(this.debug, `${this.storageName} - (getPersistedStore)`);
+      consoleDebug(this.debugMode, `${this.storageName} - (getPersistedStore)`);
 
       // @ts-ignore
       return this.storageAdapter.getItem(this.storageName);
