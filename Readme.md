@@ -54,9 +54,10 @@ npm i mobx-persist-store
 ```javascript
 makePersistable(this, { name: 'SampleStore', properties: ['someProperty'], storage: window.localStorage });
 ```
-To simply persist your MobX store use `makePersistable` and pass a reference of the store (`this`) to the first argument.
-The second argument is the storage options for persisting the store data. There are two properties that are required are `name`, `properties`.
-The `storage` property is required in the example below but if you use `configurePersistable` you can set a global storage adapter, so you only have to set it once.
+To simply persist your MobX store use `makePersistable`. Pass a reference of the store (`this`) as the first argument. 
+The second argument is the [StorageOptions](#storageoptions--reactionoptions) for persisting the store data. 
+In the example below `name`, `properties`, and `storage` properties are required but if you use [configurePersistable](#global-configuration) you can set a global storage adapter, so you only have to set it once. 
+You can also pass a third argument ([ReactionOptions](#storageoptions--reactionoptions)) to control when data should be saved.
 
 Hydration of the store will happen automatically when `makePersistable` is created.
 
@@ -103,7 +104,7 @@ makePersistable(
 
 ## Global Configuration
 
-If you plan on using the same values for some options you can set them globally with the `configurePersistable` function.
+If you plan on using the same values for some options you can set them globally with the `configurePersistable`.
 
 ```javascript
 import { configurePersistable } from 'mobx-persist-store';
@@ -144,7 +145,8 @@ You should only need `makePersistable` but this library also provides other util
 >   someProperty: [];
 > 
 >   constructor() {
->     makeAutoObservable(this, {}, { autoBind: true });
+>     makeAutoObservable(this);
+> 
 >     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
 >   }
 > }
@@ -153,7 +155,7 @@ You should only need `makePersistable` but this library also provides other util
 #### StorageOptions & ReactionOptions
 
 > **StorageOptions**
->  - `name` (String) - should be a unique identifier and will be available within the read/write functions of the StorageAdapter.
+>  - `name` (String) - should be a unique identifier and will be used as the key for the data storage.
 >  - `properties` (Array of String) - A list of observable properties on the store you want to persist. Doesn't save MobX actions or computed values.
 >  - `storage` [localStorage Like API](https://hacks.mozilla.org/2009/06/localstorage/) - facilitates the reading, writing, and removal of the persisted store data. For **ReactNative** it may be `AsyncStorage`, `FS`, etc. and for **React** - `localStorage`, `sessionStorage`, `localForage` etc.
 >     - If you have an app that is Server-side rendering (SSR) you can set the value `undefined` to prevent errors.
@@ -165,7 +167,7 @@ You should only need `makePersistable` but this library also provides other util
 > **ReactionOptions** [MobX Reactions Options](https://mobx.js.org/reactions.html#options-)
 >  - `delay` (Number) - that allows you to set a `delay` option to limit the amount of times the `write` function is called. No delay by default.
 >     -  For example if you have a `200` millisecond delay and two changes happen within the delay time then the `write` function is only called once. If you have no delay then the `write` function would be called twice.
->  - `fireImmediately` (Boolean) - that determines if the store data should immediately be persisted or wait until the first property change in the store. `false` by default.
+>  - `fireImmediately` (Boolean) - that determines if the store data should immediately be persisted or wait until a property in store changes. `false` by default.
 > 
 > ```javascript
 > configurePersistable(
@@ -305,8 +307,8 @@ You should only need `makePersistable` but this library also provides other util
 >   }
 > }
 > ```
-> The function prevents memory leaks when you have store(s) that are removed or re-crated. 
-> In the React example below `stopPersisting` is called with the component is unmounted.
+> This function prevents memory leaks when you have store(s) that are removed or re-crated. 
+> In the React example below `stopPersisting` is called when the component is unmounted.
 > 
 > ```javascript
 > import React, { useEffect, useState } from 'react';
@@ -406,7 +408,7 @@ You should only need `makePersistable` but this library also provides other util
 > ```javascript
 > import { PersistStoreMap } from 'mobx-persist-store';
 >
-> Array.from(PersistStoreMap.values()).map((persistStore) => persistStore.isHydrated);
+> Array.from(PersistStoreMap.values()).map((persistStore) => persistStore.getPersistedStore());
 > ```
 
 ## Links
