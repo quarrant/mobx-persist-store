@@ -1,5 +1,5 @@
-import { StorageConfiguration } from './StorageConfiguration';
+import { PersistStoreMap } from './PersistStoreMap';
 
 export const startPersisting = <T>(target: T): void => {
-  StorageConfiguration.get(target)?.startPersisting();
+  PersistStoreMap.get(target)?.startPersisting();
 };

@@ -1,5 +1,5 @@
-import { StorageConfiguration } from './StorageConfiguration';
+import { PersistStoreMap } from './PersistStoreMap';
 
 export const isHydrated = <T>(target: T): boolean => {
-  return StorageConfiguration.get(target)?.isHydrated ?? false;
+  return PersistStoreMap.get(target)?.isHydrated ?? false;
 };

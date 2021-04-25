@@ -1,22 +1,22 @@
 import { PersistenceStorageOptions, ReactionOptions } from './types';
-import { StorePersist } from './StorePersist';
-import { StorageConfiguration } from './StorageConfiguration';
+import { PersistStore } from './PersistStore';
+import { PersistStoreMap } from './PersistStoreMap';
 import { duplicatedStoreWarningIf } from './utils';
 
 export const makePersistable = <T extends { [key: string]: any }, P extends keyof T>(
   target: T,
   storageOptions: PersistenceStorageOptions<P>,
-  reactionOptions?: ReactionOptions
-): StorePersist<T, P> => {
-  const mobxPersistStore = new StorePersist(target, storageOptions, reactionOptions);
+  reactionOptions?: ReactionOptions,
+): PersistStore<T, P> => {
+  const mobxPersistStore = new PersistStore(target, storageOptions, reactionOptions);
 
-  const hasPersistedStoreAlready = Array.from(StorageConfiguration.values())
+  const hasPersistedStoreAlready = Array.from(PersistStoreMap.values())
     .map((item) => item.storageName)
     .includes(mobxPersistStore.storageName);
 
   duplicatedStoreWarningIf(hasPersistedStoreAlready, mobxPersistStore.storageName);
 
-  StorageConfiguration.set(target, mobxPersistStore);
+  PersistStoreMap.set(target, mobxPersistStore);
 
   return mobxPersistStore;
 };

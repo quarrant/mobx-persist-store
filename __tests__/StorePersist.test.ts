@@ -1,5 +1,5 @@
 import ms from 'milliseconds';
-import { ReactionOptions, StorageOptions, StorePersist } from '../src';
+import { ReactionOptions, StorageOptions, PersistStore } from '../src';
 import { makeObservable, observable } from 'mobx';
 import { configurePersistable } from '../src';
 import mockConsole from 'jest-mock-console';
@@ -38,7 +38,7 @@ describe('StorePersist', () => {
 
   describe('storageAdapter', () => {
     test(`should have default values`, () => {
-      const storePersist = new StorePersist(myStore, { name: 'myStoreUndefined', properties: ['list'] });
+      const storePersist = new PersistStore(myStore, { name: 'myStoreUndefined', properties: ['list'] });
 
       expect(storePersist['storageAdapter']).toEqual({
         options: {
@@ -55,7 +55,7 @@ describe('StorePersist', () => {
     });
 
     test(`should be all set`, () => {
-      const storePersist = new StorePersist(
+      const storePersist = new PersistStore(
         myStore,
         {
           name: 'myStoreSet',
@@ -78,7 +78,7 @@ describe('StorePersist', () => {
           ...reactionOptions,
         },
       );
-      const storePersist = new StorePersist(myStore, { name: 'myStoreConfigurePersistable', properties: ['list'] });
+      const storePersist = new PersistStore(myStore, { name: 'myStoreConfigurePersistable', properties: ['list'] });
 
       expect(storePersist['storageAdapter']).toEqual({ options: persistenceStorageOptions });
       expect(storePersist['reactionOptions']).toEqual(reactionOptions);
@@ -99,7 +99,7 @@ describe('StorePersist', () => {
         getItem: (key: string) => '',
         removeItem: (key: string) => {},
       };
-      const storePersist = new StorePersist(
+      const storePersist = new PersistStore(
         myStore,
         {
           name: 'myStoreOverride',

@@ -1,5 +1,5 @@
-import { StorageConfiguration } from './StorageConfiguration';
+import { PersistStoreMap } from './PersistStoreMap';
 
 export const clearPersistedStore = async <T>(target: T): Promise<void> => {
-  await StorageConfiguration.get(target)?.clearPersistedStore();
+  await PersistStoreMap.get(target)?.clearPersistedStore();
 };

@@ -1,4 +1,3 @@
-import { mpsConfig } from './configurePersistable';
 import { StorageController } from './types';
 
 export const buildExpireTimestamp = (milliseconds: number): number => {
@@ -78,8 +77,8 @@ export const actionPersistWarningIf = (isComputedProperty: boolean, propertyName
   }
 };
 
-export const consoleDebug = (message: string, content: any = ''): void => {
-  if (isBrowser && isNotProductionBuild && mpsConfig.debug) {
+export const consoleDebug = (isDebugMode: boolean, message: string, content: any = ''): void => {
+  if (isDebugMode && isBrowser && isNotProductionBuild) {
     console.info(
       `%c mobx-persist-store: (Debug Mode) ${message} `,
       'background: #4B8CC5; color: black; display: block;',

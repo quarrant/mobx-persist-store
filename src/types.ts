@@ -20,7 +20,7 @@ export interface StorageOptions {
    */
   expireIn?: number;
   /**
-   * @property {Number} [removeOnExpiration] If {@link StorageOptions#expireIn} has a value and has expired, the data in storage will be removed automatically when getItem is called. The default value is true.
+   * @property {Boolean} [removeOnExpiration] If {@link StorageOptions#expireIn} has a value and has expired, the data in storage will be removed automatically when getItem is called. The default value is true.
    * @default true
    */
   removeOnExpiration?: boolean;

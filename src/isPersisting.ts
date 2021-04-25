@@ -1,5 +1,5 @@
-import { StorageConfiguration } from './StorageConfiguration';
+import { PersistStoreMap } from './PersistStoreMap';
 
 export const isPersisting = <T>(target: T): boolean => {
-  return StorageConfiguration.get(target)?.isPersisting ?? false;
+  return PersistStoreMap.get(target)?.isPersisting ?? false;
 };

@@ -1,5 +1,5 @@
-import { StorageConfiguration } from './StorageConfiguration';
+import { PersistStoreMap } from './PersistStoreMap';
 
 export const stopPersisting = <T>(target: T): void => {
-  StorageConfiguration.get(target)?.stopPersisting();
+  PersistStoreMap.get(target)?.stopPersisting();
 };
