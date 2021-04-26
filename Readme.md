@@ -164,7 +164,7 @@ You should only need `makePersistable` but this library also provides other util
 > **StorageOptions**
 >  - `name` (String) - Should be a unique identifier and will be used as the key for the data storage.
 >  - `properties` (Array of String) - A list of observable properties on the store you want to persist. Doesn't save MobX actions or computed values.
->  - `storage` [localStorage Like API](https://hacks.mozilla.org/2009/06/localstorage/) - facilitates the reading, writing, and removal of the persisted store data. For **ReactNative** it may be `AsyncStorage`, `FS`, etc. and for **React** - `localStorage`, `sessionStorage`, `localForage` etc.
+>  - `storage` ([localStorage Like API](https://hacks.mozilla.org/2009/06/localstorage/)) - Facilitates the reading, writing, and removal of the persisted store data. For **ReactNative** it may be `AsyncStorage`, `FS`, etc. and for **React** - `localStorage`, `sessionStorage`, `localForage` etc.
 >     - If you have an app that is Server-side rendering (SSR) you can set the value `undefined` to prevent errors.
 >  - `expireIn` (Number) - A value in milliseconds to determine when the data in storage should not be retrieved by getItem. Never expires by default.
 >  - `removeOnExpiration` (Boolean) - If expireIn has a value and has expired, the data in storage will be removed automatically when getItem is called. The default value is true.
