@@ -120,11 +120,18 @@ configurePersistable(
   },
   { delay: 200, fireImmediately: false }
 );
+```
+```javascript
+export class SampleStore {
+  someProperty: [];
 
-...
+  constructor() {
+    makeAutoObservable(this);
 
-// Now makePersistable only needs `name` and `properties`:
-makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+    // Now makePersistable only needs `name` and `properties`:
+    makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+  }
+}
 ```
 
 `configurePersistable` sets items globally, but you can override them within `makePersistable`.
@@ -155,7 +162,7 @@ You should only need `makePersistable` but this library also provides other util
 #### StorageOptions & ReactionOptions
 
 > **StorageOptions**
->  - `name` (String) - should be a unique identifier and will be used as the key for the data storage.
+>  - `name` (String) - Should be a unique identifier and will be used as the key for the data storage.
 >  - `properties` (Array of String) - A list of observable properties on the store you want to persist. Doesn't save MobX actions or computed values.
 >  - `storage` [localStorage Like API](https://hacks.mozilla.org/2009/06/localstorage/) - facilitates the reading, writing, and removal of the persisted store data. For **ReactNative** it may be `AsyncStorage`, `FS`, etc. and for **React** - `localStorage`, `sessionStorage`, `localForage` etc.
 >     - If you have an app that is Server-side rendering (SSR) you can set the value `undefined` to prevent errors.
@@ -165,9 +172,9 @@ You should only need `makePersistable` but this library also provides other util
 >  - `debugMode` (Boolean) - When true a console.info will be called for several of mobx-persist-store items. The default value is false.
 > 
 > **ReactionOptions** [MobX Reactions Options](https://mobx.js.org/reactions.html#options-)
->  - `delay` (Number) - that allows you to set a `delay` option to limit the amount of times the `write` function is called. No delay by default.
+>  - `delay` (Number) - Allows you to set a `delay` option to limit the amount of times the `write` function is called. No delay by default.
 >     -  For example if you have a `200` millisecond delay and two changes happen within the delay time then the `write` function is only called once. If you have no delay then the `write` function would be called twice.
->  - `fireImmediately` (Boolean) - that determines if the store data should immediately be persisted or wait until a property in store changes. `false` by default.
+>  - `fireImmediately` (Boolean) - Determines if the store data should immediately be persisted or wait until a property in store changes. `false` by default.
 > 
 > ```javascript
 > configurePersistable(
