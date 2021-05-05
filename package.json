@@ -1,6 +1,6 @@
 {
   "name": "mobx-persist-store",
-  "version": "0.5.29",
+  "version": "1.0.0-rc.0",
   "description": "Mobx Persist Store",
   "author": "quarrant",
   "license": "MIT",
