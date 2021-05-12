@@ -32,7 +32,7 @@ export const isFunction = (functionToCheck: any): boolean => {
   return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 };
 
-export const isStorageAdaptorLike = (value: StorageController | Storage | undefined): value is StorageController => {
+export const isStorageControllerLike = (value: StorageController | Storage | undefined): value is StorageController => {
   if (value instanceof Storage) {
     return true;
   }
@@ -54,9 +54,9 @@ export const invalidStorageAdaptorWarningIf = (
   storageAdaptor: StorageController | undefined,
   storageName: string,
 ): void => {
-  if (isBrowser && isNotProductionBuild && !isStorageAdaptorLike(storageAdaptor)) {
+  if (isBrowser && isNotProductionBuild && !isStorageControllerLike(storageAdaptor)) {
     console.warn(
-      `mobx-persist-store: ${storageName} does not have a valid storage adaptor.\n\n* Make sure the storage adapter has 'getItem', 'setItem' and 'removeItem' methods."`,
+      `mobx-persist-store: ${storageName} does not have a valid storage adaptor.\n\n* Make sure the storage controller has 'getItem', 'setItem' and 'removeItem' methods."`,
     );
   }
 };

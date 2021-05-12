@@ -52,7 +52,7 @@ describe('StorePersist', () => {
       });
       expect(storePersist['reactionOptions']).toEqual({ delay: undefined, fireImmediately: true });
       expect(console.warn).toHaveBeenCalledWith(
-        `mobx-persist-store: myStore does not have a valid storage adaptor.\n\n* Make sure the storage adapter has 'getItem', 'setItem' and 'removeItem' methods."`,
+        `mobx-persist-store: myStore does not have a valid storage adaptor.\n\n* Make sure the storage controller has 'getItem', 'setItem' and 'removeItem' methods."`,
       );
     });
 
