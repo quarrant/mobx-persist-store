@@ -46,8 +46,8 @@ npm i mobx-persist-store
 ## Demo
 
 
-<a href="https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark" target="_blank">Mobx Persist Store with MobX 6</a>
-<a href="https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark" target="_blank">![demo screen shot](./demo-screen-shot.png)</a>
+<a href="https://codesandbox.io/s/mobx-persist-store-version-1-f852w?file=/src/stores/User.store.ts&theme=dark" target="_blank">Mobx Persist Store with MobX 6</a>
+<a href="https://codesandbox.io/s/mobx-persist-store-version-1-f852w?file=/src/stores/User.store.ts&theme=dark" target="_blank">![demo screen shot](./demo-screen-shot.png)</a>
 
 ## Getting Started
 
