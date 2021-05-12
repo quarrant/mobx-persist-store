@@ -18,6 +18,7 @@ describe('StorePersist', () => {
     expireIn: ms.days(7),
     removeOnExpiration: false,
     stringify: false,
+    debugMode: false,
     storage: localStorage,
   };
   const reactionOptions: ReactionOptions = {
@@ -38,7 +39,7 @@ describe('StorePersist', () => {
 
   describe('storageAdapter', () => {
     test(`should have default values`, () => {
-      const storePersist = new PersistStore(myStore, { name: 'myStoreUndefined', properties: ['list'] });
+      const storePersist = new PersistStore(myStore, { name: 'myStore', properties: ['list'] });
 
       expect(storePersist['storageAdapter']).toEqual({
         options: {
@@ -46,11 +47,12 @@ describe('StorePersist', () => {
           removeOnExpiration: true,
           storage: undefined,
           stringify: true,
+          debugMode: false,
         },
       });
       expect(storePersist['reactionOptions']).toEqual({ delay: undefined, fireImmediately: true });
       expect(console.warn).toHaveBeenCalledWith(
-        `mobx-persist-store: myStoreUndefined does not have a valid storage adaptor and data will not be persisted. Please set "storage:" `,
+        `mobx-persist-store: myStore does not have a valid storage adaptor.\n\n* Make sure the storage adapter has 'getItem', 'setItem' and 'removeItem' methods."`,
       );
     });
 
@@ -107,13 +109,20 @@ describe('StorePersist', () => {
           expireIn: ms.hours(7),
           removeOnExpiration: true,
           stringify: true,
+          debugMode: true,
           storage: storage,
         },
         { delay: 300, fireImmediately: true },
       );
 
       expect(storePersist['storageAdapter']).toEqual({
-        options: { expireIn: ms.hours(7), removeOnExpiration: true, stringify: true, storage: storage },
+        options: {
+          expireIn: ms.hours(7),
+          removeOnExpiration: true,
+          stringify: true,
+          debugMode: true,
+          storage: storage,
+        },
       });
       expect(storePersist['reactionOptions']).toEqual({ delay: 300, fireImmediately: true });
       expect(storePersist['storageAdapter']?.options.storage).toBe(storage);
