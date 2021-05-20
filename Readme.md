@@ -385,6 +385,7 @@ You should only need `makePersistable` but this library also provides other util
 > }
 > ```
 
+
 #### getPersistedStore (Promise)
 
 > **getPersistedStore** will get the persisted data. This function is provide to manually get the store's persisted data.
