@@ -15,17 +15,22 @@
 
 - [Installation](#installation)
 - [Demo](#demo)
-- [Usage](#usage)
-  - [With Decorators](#with-decorators)
-  - [Without Decorators](#without-decorators)
-  - [With Mobx 6](#with-mobx-6)
+- [Getting Started](#getting-started)
+- [Simple Example](#simple-example)
+- [Example With All Options](#example-with-all-options)
+- [Global Configuration](#global-configuration)
 - [API](#api)
-  - [persistence](#persistence)
-  - [StorageAdapter](#storageadapter)
-  - [clearPersist](#clearpersist)
-  - [stopPersist](#stoppersist)
-  - [startPersist](#startpersist)
-  - [isSynchronized](#issynchronized)
+  - [makePersistable](#makepersistable)
+  - [StorageOptions & ReactionOptions](#storageoptions--reactionoptions)
+  - [isHydrated](#ishydrated)
+  - [isPersisting](#ispersisting)
+  - [pausePersisting](#pausepersisting)
+  - [startPersisting](#startpersisting)
+  - [stopPersisting](#stoppersisting)
+  - [hydrateStore](#hydratestore-promise)
+  - [clearPersistedStore](#clearpersistedstore-promise)
+  - [getPersistedStore](#getpersistedstore-promise)
+  - [PersistStoreMap](#persiststoremap)
 - [Links](#links)
 
 ## Installation
@@ -41,285 +46,377 @@ npm i mobx-persist-store
 ## Demo
 
 
-<a href="https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark" target="_blank">Mobx Persist Store with MobX 6</a>
-<a href="https://codesandbox.io/s/mobx-persist-store-with-mobx-6-zosms?fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstores%2FUser.store.ts&theme=dark" target="_blank">![demo screen shot](./demo-screen-shot.png)</a>
+<a href="https://codesandbox.io/s/mobx-persist-store-version-1-f852w?file=/src/stores/User.store.ts&theme=dark" target="_blank">Mobx Persist Store with MobX 6</a>
+<a href="https://codesandbox.io/s/mobx-persist-store-version-1-f852w?file=/src/stores/User.store.ts&theme=dark" target="_blank">![demo screen shot](./demo-screen-shot.png)</a>
 
-
-## Usage
-
-Use the **StorageAdapter** to connect to your library from cache. It can be anything that is able to read and write data. For **ReactNative** it may be `AsyncStorage`, `FS`, etc. and for **React** - `localStorage`, `sessionStorage`, etc.
-
-### With Decorators
+## Getting Started
 
 ```javascript
-import { action, observable, computed } from 'mobx';
-import { persistence, clearPersist, stopPersist, isSynchronized, StorageAdapter } from 'mobx-persist-store';
-
-function readStore(name) {
-  return new Promise((resolve) => {
-    const data = localStorage.getItem(name);
-    resolve(data);
-  });
-}
-
-function writeStore(name, content) {
-  return new Promise((resolve) => {
-    localStorage.setItem(name, content);
-    resolve();
-  });
-}
-
-@persistence({
-  name: 'CounterStore',
-  properties: ['counter'],
-  adapter: new StorageAdapter({
-    read: readStore,
-    write: writeStore,
-  }),
-  reactionOptions: { // optional
-    delay: 200
-  },
-})
-class CounterStore {
-  @observable counter = 0;
-
-  @action tickCounter = () => {
-    this.counter = this.counter + 1;
-  };
-
-  @action clearStore = () => {
-    clearPersist(this)
-  }
-
-  @action stopPersist = () => {
-    stopPersist(this)
-  }
-
-  @computed get isSynchronized() {
-    return isSynchronized(this)
-  }
-}
-
-export default new CounterStore();
+makePersistable(this, { name: 'SampleStore', properties: ['someProperty'], storage: window.localStorage });
 ```
+To simply persist your MobX store use `makePersistable`. Pass a reference of the store (`this`) as the first argument. 
+The second argument is the [StorageOptions](#storageoptions--reactionoptions) for persisting the store data. 
+In the example below `name`, `properties`, and `storage` properties are required but if you use [configurePersistable](#global-configuration) you can set a global storage adapter, so you only have to set it once. 
+You can also pass a third argument ([ReactionOptions](#storageoptions--reactionoptions)) to control when data should be saved.
 
-### Without Decorators
+Hydration of the store will happen automatically when `makePersistable` is created.
 
-```javascript
-import { action, observable, computed, decorate } from 'mobx';
-import { persistence, clearPersist, stopPersist, isSynchronized, StorageAdapter } from 'mobx-persist-store';
-
-function readStore(name) {
-  return new Promise((resolve) => {
-    const data = localStorage.getItem(name);
-    resolve(data);
-  });
-}
-
-function writeStore(name, content) {
-  return new Promise((resolve) => {
-    localStorage.setItem(name, content);
-    resolve();
-  });
-}
-
-class CounterStore {
-  counter = 0;
-
-  tickCounter = () => {
-    this.counter = this.counter + 1;
-  };
-
-  clearStore = () => {
-    clearPersist(this)
-  }
-
-  stopPersist = () => {
-    stopPersist(this)
-  }
-
-  get isSynchronized() {
-    return isSynchronized(this)
-  }
-}
-
-decorate(CounterStore, {
-  counter: observable,
-  tickCounter: action,
-  clearStore: action,
-  persistDispose: action,
-  isSynchronized: computed
-})
-
-persistence({
-  name: 'CounterStore',
-  properties: ['counter'],
-  adapter: new StorageAdapter({
-    read: readStore,
-    write: writeStore,
-  }),
-  reactionOptions: { // optional
-    delay: 200
-  },
-})(CounterStore);
-
-export default new CounterStore();
-```
-
-### With Mobx 6
+### Simple Example
 
 ```javascript
 import { makeAutoObservable } from 'mobx';
-import { persistence, clearPersist, stopPersist, isSynchronized, StorageAdapter } from 'mobx-persist-store';
+import { makePersistable } from 'mobx-persist-store';
 
-function readStore(name) {
-  return new Promise((resolve) => {
-    const data = localStorage.getItem(name);
-    resolve(data);
-  });
+export class SampleStore {
+  someProperty: [];
+  
+  constructor() {
+    makeAutoObservable(this);
+
+    makePersistable(this, { name: 'SampleStore', properties: ['someProperty'], storage: window.localStorage });
+  }
 }
+```
 
-function writeStore(name, content) {
-  return new Promise((resolve) => {
-    localStorage.setItem(name, content);
-    resolve();
-  });
-}
 
-class CounterStore {
-  counter = 0;
+### Example With All Options
 
-  tickCounter = () => {
-    this.counter = this.counter + 1;
-  };
+```javascript
+import { makePersistable } from 'mobx-persist-store';
+import localForage from "localforage";
+
+...
+makePersistable(
+  this,
+  {
+    name: 'SampleStore',
+    properties: ['someProperty'],
+    storage: localForage,  // localForage, window.localStorage, AsyncStorage all have the same interface
+    expireIn: 86400000, // One day in millsesconds
+    removeOnExpiration: true,
+    stringify: false,
+    debugMode: true,
+  },
+  { delay: 200, fireImmediately: false },
+);
+...
+```
+
+## Global Configuration
+
+If you plan on using the same values for some options you can set them globally with the `configurePersistable`.
+
+```javascript
+import { configurePersistable } from 'mobx-persist-store';
+
+// All properties are optional
+configurePersistable(
+  {
+    storage: window.localStorage,
+    expireIn: 86400000,
+    removeOnExpiration: true,
+    stringify: false,
+    debugMode: true,
+  },
+  { delay: 200, fireImmediately: false }
+);
+```
+```javascript
+export class SampleStore {
+  someProperty: [];
 
   constructor() {
     makeAutoObservable(this);
+
+    // Now makePersistable only needs `name` and `properties`:
+    makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
   }
 }
-
-export default persistence({
-  name: 'CounterStore',
-  properties: ['counter'],
-  adapter: new StorageAdapter({
-    read: readStore,
-    write: writeStore,
-  }),
-  reactionOptions: {
-    // optional
-    delay: 200,
-  },
-})(new CounterStore());
 ```
+
+`configurePersistable` sets items globally, but you can override them within `makePersistable`.
 
 ## API
 
-#### persistence
+You should only need `makePersistable` but this library also provides other utils for more advance usage.
 
-> **persistence** creates a reaction to changes in observable properties.
->  - `name` should be a unique identifier and will be available within the read/write functions of the StorageAdapter.
->  - `properties` is a list of observable properties on the store you want to persist.
->  - `adapter` facilitates the reading and writing of the persisted store data.
->  - `reactionOptions` is an optional property that allows you to set a `delay` option to limit the amount of times the `write` function is called.
+#### makePersistable
+
+> **makePersistable** sets up store persisting.
+>
+> ```javascript
+> import { makeAutoObservable } from 'mobx';
+> import { makePersistable } from 'mobx-persist-store';
+>
+> class SampleStore {
+>   someProperty: [];
+> 
+>   constructor() {
+>     makeAutoObservable(this);
+> 
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+>   }
+> }
+> ```
+
+#### StorageOptions & ReactionOptions
+
+> **StorageOptions**
+>  - `name` (String) - Should be a unique identifier and will be used as the key for the data storage.
+>  - `properties` (Array of String) - A list of observable properties on the store you want to persist. Doesn't save MobX actions or computed values.
+>  - `storage` ([localStorage Like API](https://hacks.mozilla.org/2009/06/localstorage/)) - Facilitates the reading, writing, and removal of the persisted store data. For **ReactNative** it may be `AsyncStorage`, `FS`, etc. and for **React** - `localStorage`, `sessionStorage`, `localForage` etc.
+>     - If you have an app that is Server-side rendering (SSR) you can set the value `undefined` to prevent errors.
+>  - `expireIn` (Number) - A value in milliseconds to determine when the data in storage should not be retrieved by getItem. Never expires by default.
+>  - `removeOnExpiration` (Boolean) - If expireIn has a value and has expired, the data in storage will be removed automatically when getItem is called. The default value is true.
+>  - `stringify` (Boolean) - When true the data will be JSON.stringify before being passed to setItem. The default value is true.
+>  - `debugMode` (Boolean) - When true a console.info will be called for several of mobx-persist-store items. The default value is false.
+> 
+> **ReactionOptions** [MobX Reactions Options](https://mobx.js.org/reactions.html#options-)
+>  - `delay` (Number) - Allows you to set a `delay` option to limit the amount of times the `write` function is called. No delay by default.
 >     -  For example if you have a `200` millisecond delay and two changes happen within the delay time then the `write` function is only called once. If you have no delay then the `write` function would be called twice.
->
+>  - `fireImmediately` (Boolean) - Determines if the store data should immediately be persisted or wait until a property in store changes. `false` by default.
+> 
 > ```javascript
-> import { persistence } from 'mobx-persist-store';
->
-> export default persistence({
->    name: 'CounterStore',
->    properties: ['counter'],
->    adapter: new StorageAdapter({
->      read: readStore,
->      write: writeStore,
->    }),
->    reactionOptions: { // optional
->      delay: 200,
->    },
-> })(new CounterStore());
-> ```
-
-#### StorageAdapter
-
-> **StorageAdapter** will handle hydrating the store with the cache data when the store is first loaded. The write function is called any time a property in the `properties` array changes.
->
-> ```javascript
-> import { StorageAdapter } from 'mobx-persist-store';
->
-> new StorageAdapter({
->   read: async (name) => {
->     const data = window.localStorage.getItem(name);
->
->     return data ? JSON.parse(data) : undefined;
+> configurePersistable(
+>   {
+>     storage: window.localStorage,
+>     expireIn: 86400000,
+>     removeOnExpiration: true,
+>     stringify: false,
+>     debugMode: true,
 >   },
->   write: async (name, content) => {
->     window.localStorage.setItem(name, JSON.stringify(content));
+>   { delay: 200, fireImmediately: false }
+> );
+> ...
+> makePersistable(
+>   this,
+>   {
+>     name: 'SampleStore', 
+>     properties: ['someProperty'],
+>     storage: window.localStorage,
+>     expireIn: 86400000,
+>     removeOnExpiration: true,
+>     stringify: false,
+>     debugMode: true,
 >   },
-> })
+>   { delay: 200, fireImmediately: false }
+> );
 > ```
 
-#### clearPersist
+#### isHydrated
 
-> **clearPersist** removes all the data that was saved from the store. The `write` function on the StorageAdapter is called with an empty object `{}`.
+> **isHydrated** will be `true` once the store has finished being updated with the persisted data.
 >
 > ```javascript
-> import { clearPersist } from 'mobx-persist-store';
+> import { makeAutoObservable } from 'mobx';
+> import { makePersistable, isHydrated } from 'mobx-persist-store';
 >
-> class CounterStore {
->   counter = 0;
->   ...
->   clearStore = () => {
->     clearPersist(this)
+> class SampleStore {
+>   someProperty: [];
+> 
+>   constructor() {
+>     makeAutoObservable(this, {}, { autoBind: true });
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+>   }
+> 
+>   get isHydrated() {
+>     return isHydrated(this);
 >   }
 > }
 > ```
 
-#### stopPersist
+#### isPersisting
 
-> **stopPersist**  stops saving any changes from the store.
+> **isPersisting** determines if the store is being currently persisted. 
+> When calling `pausePersisting` the value will be `false` and `true` with `startPersisting` is called.
 >
 > ```javascript
-> import { stopPersist } from 'mobx-persist-store';
+> import { makeAutoObservable } from 'mobx';
+> import { makePersistable, isPersisting } from 'mobx-persist-store';
 >
-> class CounterStore {
->   counter = 0;
->   ...
->   stopPersist = () => {
->     stopPersist(this)
+> class SampleStore {
+>   someProperty: [];
+> 
+>   constructor() {
+>     makeAutoObservable(this, {}, { autoBind: true });
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+>   }
+> 
+>   get isPersisting() {
+>     return isPersisting(this);
 >   }
 > }
 > ```
 
-#### startPersist
+#### pausePersisting
 
-> **startPersist**  restarts saving any changes from the store if you previously called `stopPersist`
+> **pausePersisting** pauses the store from persisting data.
 >
 > ```javascript
-> import { startPersist } from 'mobx-persist-store';
+> import { makeAutoObservable } from 'mobx';
+> import { makePersistable, pausePersisting } from 'mobx-persist-store';
 >
-> class CounterStore {
->   counter = 0;
->   ...
->   startPersist = () => {
->     startPersist(this)
+> class SampleStore {
+>   someProperty: [];
+> 
+>   constructor() {
+>     makeAutoObservable(this, {}, { autoBind: true });
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+>   }
+> 
+>   pauseStore() {
+>     pausePersisting(this);
 >   }
 > }
 > ```
 
-#### isSynchronized
+#### startPersisting
 
-> **isSynchronized** indicates whether the store has been restored after reading the cache asynchronous.
+> **startPersisting** starts persisting the store data again after `pausePersisting` was called.
 >
 > ```javascript
-> import { isSynchronized } from 'mobx-persist-store';
+> import { makeAutoObservable } from 'mobx';
+> import { makePersistable, startPersisting } from 'mobx-persist-store';
 >
-> class CounterStore {
->   counter = 0;
->   ...
->   get isSynchronized() {
->     return isSynchronized(this)
+> class SampleStore {
+>   someProperty: [];
+> 
+>   constructor() {
+>     makeAutoObservable(this, {}, { autoBind: true });
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+>   }
+> 
+>   startStore() {
+>     startPersisting(this);
 >   }
 > }
+> ```
+
+#### stopPersisting
+
+> **stopPersisting** calls `pausePersisting` and internally removes reference to the store. 
+> You should only call this function if you have store(s) that are re-created or do not live for the entire life of your application.
+>
+> ```javascript
+> import { makeAutoObservable } from 'mobx';
+> import { makePersistable, stopPersisting } from 'mobx-persist-store';
+>
+> class SampleStore {
+>   someProperty: [];
+> 
+>   constructor() {
+>     makeAutoObservable(this, {}, { autoBind: true });
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+>   }
+> 
+>   stopStore() {
+>     stopPersisting(this);
+>   }
+> }
+> ```
+> This function prevents memory leaks when you have store(s) that are removed or re-crated. 
+> In the React example below `stopPersisting` is called when the component is unmounted.
+> 
+> ```javascript
+> import React, { useEffect, useState } from 'react';
+> import { observer } from 'mobx-react-lite';
+> import { stopPersisting } from 'mobx-persist-store';
+> 
+> export const SamplePage = observer(() => {
+>   const [localStore] = useState(() => new SampleStore());
+> 
+>   useEffect(() => {
+>     // Called when the component is unmounted
+>     return () => localStore.stopStore();
+>   }, []);
+> 
+>   return (
+>     <div>
+>       {localStore.someProperty.map((item) => (
+>         <div key={item.name}>{item.name}</div>
+>       ))}
+>     </div>
+>   );
+> });
+> ```
+
+#### hydrateStore (Promise)
+
+> **hydrateStore** will update the store with the persisted data. This will happen automatically with the initial `makePersistable` call.
+> This function is provide to manually hydrate the store. You should not have to call it unless you are doing something that modified the persisted data outside the store.
+>
+> ```javascript
+> import { makeAutoObservable } from 'mobx';
+> import { makePersistable, hydrateStore } from 'mobx-persist-store';
+>
+> class SampleStore {
+>   someProperty: [];
+> 
+>   constructor() {
+>     makeAutoObservable(this, {}, { autoBind: true });
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+>   }
+> 
+>   async hydrateStore() {
+>     await hydrateStore(this);
+>   }
+> }
+> ```
+
+#### clearPersistedStore (Promise)
+
+> **clearPersistedStore** will remove the persisted data. This function is provide to manually clear the store's persisted data.
+>
+> ```javascript
+> import { makeAutoObservable } from 'mobx';
+> import { makePersistable, clearPersistedStore } from 'mobx-persist-store';
+>
+> class SampleStore {
+>   someProperty: [];
+> 
+>   constructor() {
+>     makeAutoObservable(this, {}, { autoBind: true });
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+>   }
+> 
+>   async clearStoredDate() {
+>     await clearPersistedStore(this);
+>   }
+> }
+> ```
+
+
+#### getPersistedStore (Promise)
+
+> **getPersistedStore** will get the persisted data. This function is provide to manually get the store's persisted data.
+>
+> ```javascript
+> import { makeAutoObservable } from 'mobx';
+> import { makePersistable, getPersistedStore } from 'mobx-persist-store';
+>
+> class SampleStore {
+>   someProperty: [];
+> 
+>   constructor() {
+>     makeAutoObservable(this, {}, { autoBind: true });
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
+>   }
+> 
+>   async getStoredData() {
+>     return getPersistedStore(this);
+>   }
+> }
+> ```
+
+#### PersistStoreMap
+
+> **PersistStoreMap** is a JavaScript Map object where the key is a reference to the store, and the value is a reference to the persist store. 
+> Note: calling `stopPersisting(this)` will remove the store and persist store references from PersistStoreMap to prevent memory leaks.
+>
+> ```javascript
+> import { PersistStoreMap } from 'mobx-persist-store';
+>
+> Array.from(PersistStoreMap.values()).map((persistStore) => persistStore.getPersistedStore());
 > ```
 
 ## Links
