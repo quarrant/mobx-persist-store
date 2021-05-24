@@ -18,7 +18,5 @@ export const makePersistable = async <T extends { [key: string]: any }, P extend
 
   PersistStoreMap.set(target, mobxPersistStore);
 
-  await mobxPersistStore.init();
-
-  return mobxPersistStore;
+  return mobxPersistStore.init();
 };
