@@ -140,7 +140,7 @@ export class SampleStore {
 
 You should only need `makePersistable` but this library also provides other utils for more advance usage.
 
-#### makePersistable
+#### makePersistable (Promise)
 
 > **makePersistable** sets up store persisting.
 >
@@ -157,6 +157,14 @@ You should only need `makePersistable` but this library also provides other util
 >     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
 >   }
 > }
+> ```
+>
+> `makePersistable` is a Promise, so you can determine when the store has been initially hydrated. Also, you can use [isHydrated](#ishydrated) to determine the hydration state.
+> ```javascript
+> ...
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] })
+>      .then((persistStore) => console.log(persistStore.isHydrated));
+> ...
 > ```
 
 #### StorageOptions & ReactionOptions

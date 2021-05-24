@@ -67,13 +67,14 @@ export class PersistStore<T, P extends keyof T> {
       storageAdapter: this.storageAdapter,
       reactionOptions: this.reactionOptions,
     });
-
-    this.init();
   }
 
-  private async init() {
+  public async init(): Promise<PersistStore<T, P>> {
     await this.hydrateStore();
+
     this.startPersisting();
+
+    return this;
   }
 
   public async hydrateStore(): Promise<void> {
