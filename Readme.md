@@ -159,7 +159,7 @@ You should only need `makePersistable` but this library also provides other util
 > }
 > ```
 >
-> `makePersistable` is a Promise, so you can also do the following to determine when the store has been initially hydrated. Also, you can use [isHydrated](#ishydrated) to determine the hydration state.
+> `makePersistable` is a Promise, so you can determine when the store has been initially hydrated. Also, you can use [isHydrated](#ishydrated) to determine the hydration state.
 > ```javascript
 > ...
 >     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] })
