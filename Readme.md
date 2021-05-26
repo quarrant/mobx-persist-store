@@ -161,9 +161,14 @@ You should only need `makePersistable` but this library also provides other util
 >
 > `makePersistable` is a Promise, so you can determine when the store has been initially hydrated. Also, you can use [isHydrated](#ishydrated) to determine the hydration state.
 > ```javascript
+> import { makeAutoObservable, action } from 'mobx';
+> import { makePersistable } from 'mobx-persist-store';
 > ...
->     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] })
->      .then((persistStore) => console.log(persistStore.isHydrated));
+>     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] }).then(
+>       action((persistStore) => {
+>         console.log(persistStore.isHydrated);
+>       })
+>     );
 > ...
 > ```
 

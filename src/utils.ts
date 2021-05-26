@@ -33,7 +33,8 @@ export const isFunction = (functionToCheck: any): boolean => {
 };
 
 export const isStorageControllerLike = (value: StorageController | Storage | undefined): value is StorageController => {
-  if (value instanceof Storage) {
+  // "typeof Storage" fixes issue with React Native
+  if (typeof Storage !== 'undefined' && value instanceof Storage) {
     return true;
   }
 
