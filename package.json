@@ -4,7 +4,8 @@
   "description": "Mobx Persist Store",
   "author": "quarrant",
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "lib/es2017/index.js",
+  "module": "lib/es5/index.js",
   "files": [
     "lib/"
   ],
@@ -25,7 +26,8 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "rm -rf lib && tsc",
+    "build": "rm -rf lib && tsc && yarn build:es5",
+    "build:es5": "tsc --project tsconfig.es5.json",
     "prepublishOnly": "yarn build",
     "npm:release": "bash scripts/make-release-branch.sh"
   },
