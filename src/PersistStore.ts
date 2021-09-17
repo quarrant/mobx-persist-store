@@ -5,6 +5,7 @@ import {
   isComputedProp,
   makeObservable,
   observable,
+  ObservableMap,
   reaction,
   runInAction,
   toJS,
@@ -18,6 +19,7 @@ import {
   computedPersistWarningIf,
   consoleDebug,
   invalidStorageAdaptorWarningIf,
+  isArrayForMap,
 } from './utils';
 
 export class PersistStore<T, P extends keyof T> {
@@ -105,6 +107,15 @@ export class PersistStore<T, P extends keyof T> {
             ].every(Boolean);
 
             if (allowPropertyHydration) {
+              if (target[propertyName] instanceof ObservableMap) {
+                const content = data[propertyName];
+
+                if (isArrayForMap(content)) {
+                  target[propertyName] = new Map(content);
+                  return;
+                }
+              }
+
               target[propertyName] = data[propertyName];
             }
           });
@@ -142,6 +153,10 @@ export class PersistStore<T, P extends keyof T> {
           actionPersistWarningIf(isActionProperty, propertyName);
 
           if (!isComputedProperty && !isActionProperty) {
+            if (target[propertyName] instanceof ObservableMap) {
+              target[propertyName] = Array.from(target[propertyName].entries());
+            }
+
             propertiesToWatch[propertyName] = toJS(target[propertyName]);
           }
         });
