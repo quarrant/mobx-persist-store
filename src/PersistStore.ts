@@ -107,16 +107,13 @@ export class PersistStore<T, P extends keyof T> {
             ].every(Boolean);
 
             if (allowPropertyHydration) {
-              if (target[propertyName] instanceof ObservableMap) {
-                const content = data[propertyName];
-
-                if (isArrayForMap(content)) {
-                  target[propertyName] = new Map(content);
-                  return;
-                }
+              const propertyData = data[propertyName];
+              
+              if (target[propertyName] instanceof ObservableMap && isArrayForMap(propertyData)) {
+                target[propertyName] = new Map(propertyData);
+              } else {
+                target[propertyName] = propertyData;
               }
-
-              target[propertyName] = data[propertyName];
             }
           });
         });
