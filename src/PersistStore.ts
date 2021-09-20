@@ -150,11 +150,13 @@ export class PersistStore<T, P extends keyof T> {
           actionPersistWarningIf(isActionProperty, propertyName);
 
           if (!isComputedProperty && !isActionProperty) {
-            if (target[propertyName] instanceof ObservableMap) {
-              target[propertyName] = Array.from(target[propertyName].entries());
+            let propertyData = target[propertyName];
+            
+            if (propertyData instanceof ObservableMap) {
+              propertyData = Array.from(propertyData.entries());
             }
 
-            propertiesToWatch[propertyName] = toJS(target[propertyName]);
+            propertiesToWatch[propertyName] = toJS(propertyData);
           }
         });
 
