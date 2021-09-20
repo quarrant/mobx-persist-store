@@ -91,3 +91,11 @@ export const consoleDebug = (isDebugMode: boolean, message: string, content: any
     );
   }
 };
+
+export const isArrayForMap = (value: unknown): value is [any, any][] => {
+  if (Array.isArray(value)) {
+    return value.every((v) => Array.isArray(v));
+  }
+
+  return false;
+};
