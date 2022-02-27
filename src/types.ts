@@ -1,6 +1,7 @@
 import { IReactionOptions } from 'mobx';
+import { IAutorunOptions } from 'mobx/src/api/autorun';
 
-export type ReactionOptions = IReactionOptions;
+export type ReactionOptions = IAutorunOptions & { fireImmediately: boolean };
 
 export interface PersistenceStorageOptions<P> extends StorageOptions {
   name: string;
