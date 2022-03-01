@@ -153,7 +153,11 @@ export class PersistStore<T, P extends keyof T> {
             let propertyData = target[propertyName];
             
             if (propertyData instanceof ObservableMap) {
-              propertyData = Array.from(propertyData.entries());
+              const mapArray: any = [];
+              propertyData.forEach((v, k) => {
+                mapArray.push([k, toJS(v)])
+              })
+              propertyData = mapArray;
             }
 
             propertiesToWatch[propertyName] = toJS(propertyData);

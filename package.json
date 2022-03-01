@@ -54,9 +54,9 @@
     "jest-localstorage-mock": "^2.4.10",
     "jest-mock-console": "^1.0.1",
     "milliseconds": "^1.0.3",
-    "mobx": "^6.3.0",
+    "mobx": "^6.4.2",
     "ts-jest": "^26.5.5",
-    "typescript": "^4.2.4"
+    "typescript": "^4.6.2"
   },
   "resolutions": {
     "json-schema": "^0.4.0"
