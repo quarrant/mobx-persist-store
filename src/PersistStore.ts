@@ -108,7 +108,7 @@ export class PersistStore<T, P extends keyof T> {
 
             if (allowPropertyHydration) {
               const propertyData = data[propertyName];
-              
+
               if (target[propertyName] instanceof ObservableMap && isArrayForMap(propertyData)) {
                 target[propertyName] = new Map(propertyData);
               } else {
@@ -151,12 +151,12 @@ export class PersistStore<T, P extends keyof T> {
 
           if (!isComputedProperty && !isActionProperty) {
             let propertyData = target[propertyName];
-            
+
             if (propertyData instanceof ObservableMap) {
               const mapArray: any = [];
               propertyData.forEach((v, k) => {
-                mapArray.push([k, toJS(v)])
-              })
+                mapArray.push([k, toJS(v)]);
+              });
               propertyData = mapArray;
             }
 
