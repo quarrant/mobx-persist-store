@@ -116,7 +116,7 @@ configurePersistable(
     stringify: false,
     debugMode: true,
   },
-  { delay: 200, fireImmediately: false },
+  { delay: 200, fireImmediately: false }
 );
 ```
 

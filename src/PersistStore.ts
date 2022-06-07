@@ -59,7 +59,7 @@ export class PersistStore<T, P extends keyof T> {
         startPersisting: action,
         stopPersisting: action,
       },
-      { autoBind: true, deep: false },
+      { autoBind: true, deep: false }
     );
 
     invalidStorageAdaptorWarningIf(this.storageAdapter.options.storage, this.storageName);
@@ -171,7 +171,7 @@ export class PersistStore<T, P extends keyof T> {
           await this.storageAdapter.setItem(this.storageName, dataToSave);
         }
       },
-      this.reactionOptions,
+      this.reactionOptions
     );
 
     this.isPersisting = true;

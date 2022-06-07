@@ -6,5 +6,5 @@
   "singleQuote": true,
   "singleAttributePerLine": true,
   "tabWidth": 2,
-  "trailingComma": "all"
+  "trailingComma": "es5"
 }
