@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import ms from 'milliseconds';
 import { ReactionOptions, StorageOptions, PersistStore } from '../src';
 import { makeObservable, observable } from 'mobx';
