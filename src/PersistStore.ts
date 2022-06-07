@@ -59,7 +59,7 @@ export class PersistStore<T, P extends keyof T> {
         startPersisting: action,
         stopPersisting: action,
       },
-      { autoBind: true, deep: false },
+      { autoBind: true, deep: false }
     );
 
     invalidStorageAdaptorWarningIf(this.storageAdapter.options.storage, this.storageName);
@@ -108,7 +108,7 @@ export class PersistStore<T, P extends keyof T> {
 
             if (allowPropertyHydration) {
               const propertyData = data[propertyName];
-              
+
               if (target[propertyName] instanceof ObservableMap && isArrayForMap(propertyData)) {
                 target[propertyName] = new Map(propertyData);
               } else {
@@ -151,12 +151,12 @@ export class PersistStore<T, P extends keyof T> {
 
           if (!isComputedProperty && !isActionProperty) {
             let propertyData = target[propertyName];
-            
+
             if (propertyData instanceof ObservableMap) {
               const mapArray: any = [];
               propertyData.forEach((v, k) => {
-                mapArray.push([k, toJS(v)])
-              })
+                mapArray.push([k, toJS(v)]);
+              });
               propertyData = mapArray;
             }
 
@@ -171,7 +171,7 @@ export class PersistStore<T, P extends keyof T> {
           await this.storageAdapter.setItem(this.storageName, dataToSave);
         }
       },
-      this.reactionOptions,
+      this.reactionOptions
     );
 
     this.isPersisting = true;

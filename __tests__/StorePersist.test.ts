@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import ms from 'milliseconds';
 import { ReactionOptions, StorageOptions, PersistStore } from '../src';
 import { makeObservable, observable } from 'mobx';
@@ -52,7 +55,7 @@ describe('StorePersist', () => {
       });
       expect(storePersist['reactionOptions']).toEqual({ delay: undefined, fireImmediately: true });
       expect(console.warn).toHaveBeenCalledWith(
-        `mobx-persist-store: myStore does not have a valid storage adaptor.\n\n* Make sure the storage controller has 'getItem', 'setItem' and 'removeItem' methods."`,
+        `mobx-persist-store: myStore does not have a valid storage adaptor.\n\n* Make sure the storage controller has 'getItem', 'setItem' and 'removeItem' methods."`
       );
     });
 
@@ -64,7 +67,7 @@ describe('StorePersist', () => {
           properties: ['list'],
           ...persistenceStorageOptions,
         },
-        reactionOptions,
+        reactionOptions
       );
 
       expect(storePersist['storageAdapter']).toEqual({ options: persistenceStorageOptions });
@@ -78,7 +81,7 @@ describe('StorePersist', () => {
         },
         {
           ...reactionOptions,
-        },
+        }
       );
       const storePersist = new PersistStore(myStore, { name: 'myStoreConfigurePersistable', properties: ['list'] });
 
@@ -93,7 +96,7 @@ describe('StorePersist', () => {
         },
         {
           ...reactionOptions,
-        },
+        }
       );
 
       const storage = {
@@ -112,7 +115,7 @@ describe('StorePersist', () => {
           debugMode: true,
           storage: storage,
         },
-        { delay: 300, fireImmediately: true },
+        { delay: 300, fireImmediately: true }
       );
 
       expect(storePersist['storageAdapter']).toEqual({

@@ -6,7 +6,7 @@ import { duplicatedStoreWarningIf } from './utils';
 export const makePersistable = async <T extends { [key: string]: any }, P extends keyof T>(
   target: T,
   storageOptions: PersistenceStorageOptions<P>,
-  reactionOptions?: ReactionOptions,
+  reactionOptions?: ReactionOptions
 ): Promise<PersistStore<T, P>> => {
   const mobxPersistStore = new PersistStore(target, storageOptions, reactionOptions);
 
