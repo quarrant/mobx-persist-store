@@ -70,7 +70,7 @@ export const duplicatedStoreWarningIf = (hasPersistedStoreAlready: boolean, stor
   }
 };
 
-export const computedPersistWarningIf = (isComputedProperty: boolean, propertyName: string): void => {
+export const computedPersistWarningIf = <P extends string>(isComputedProperty: boolean, propertyName: P): void => {
   if (isBrowser && isNotProductionBuild && isComputedProperty) {
     console.warn(`mobx-persist-store: The property '${propertyName}' is computed and will not persist.`);
   }
