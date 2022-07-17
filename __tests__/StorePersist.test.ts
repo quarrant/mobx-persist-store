@@ -2,12 +2,10 @@
  * @jest-environment jsdom
  */
 import ms from 'milliseconds';
-import { makeObservable, observable } from 'mobx';
+import { makeObservable, observable, runInAction } from 'mobx';
 import mockConsole from 'jest-mock-console';
 
-import { clock } from '../setup-fake-timers';
-import { ReactionOptions, StorageOptions, PersistStore } from '../src';
-import { configurePersistable } from '../src';
+import { ReactionOptions, StorageOptions, PersistStore, configurePersistable } from '../src';
 
 class MyStore {
   list: string[] = [];
@@ -133,9 +131,7 @@ describe('StorePersist', () => {
       expect(storePersist['storageAdapter']?.options.storage).toBe(storage);
     });
 
-    test('should work serialize/deserialize', () => {
-      persistenceStorageOptions.storage?.setItem('myStoreSet', JSON.stringify({ list: ['test'] }))
-
+    test('should work serialize/deserialize', async () => {
       const storePersist = new PersistStore(
         myStore,
         {
@@ -143,30 +139,45 @@ describe('StorePersist', () => {
           properties: [{
             key: 'list',
             // @ts-ignore
-            serialize: (value) => value.toString(),
+            serialize: (value) => {
+              return value.join(',')
+            },
             // @ts-ignore
             deserialize: (value) => {
-              return Array.isArray(value) && value.every(v => typeof v === 'string') ? value : []
+              return value.split(',')
             }
           }],
           ...persistenceStorageOptions,
-        }
+          stringify: true
+        },
       );
-
-      storePersist.init()
 
       const spyOnSerialize = jest.spyOn(storePersist['properties'][0], 'serialize');
       const spyOnDeserialize = jest.spyOn(storePersist['properties'][0], 'deserialize');
 
-      clock.tick(500)
+      await storePersist.init();
 
-      expect(spyOnSerialize).toBeCalledTimes(0)
+      expect(storePersist.isHydrated).toEqual(true);
 
-      clock.tick(100)
+      expect(spyOnSerialize).toBeCalledTimes(1);
+      expect(spyOnDeserialize).toBeCalledTimes(0);
 
-      expect(spyOnDeserialize).toBeCalledTimes(1)
+      expect(myStore.list).toEqual([]);
 
-      expect(myStore.list).toEqual(['test'])
+      runInAction(() => myStore.list = ['test']);
+
+      expect(spyOnSerialize).toBeCalledTimes(2);
+      expect(spyOnDeserialize).toBeCalledTimes(0);
+
+      storePersist.pausePersisting();
+
+      runInAction(() => myStore.list = []);
+
+      await storePersist.hydrateStore();
+
+      expect(myStore.list).toEqual(['test']);
+
+      return
     })
   });
 });
