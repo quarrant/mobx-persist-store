@@ -90,7 +90,7 @@ makePersistable(
     name: 'SampleStore',
     properties: ['someProperty'],
     storage: localForage,  // localForage, window.localStorage, AsyncStorage all have the same interface
-    expireIn: 86400000, // One day in millsesconds
+    expireIn: 86400000, // One day in milliseconds
     removeOnExpiration: true,
     stringify: false,
     debugMode: true,
