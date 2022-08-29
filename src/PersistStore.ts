@@ -142,7 +142,7 @@ export class PersistStore<T, P extends keyof T> {
 
     this.cancelWatch = reaction(
       () => {
-        const propertiesToWatch = <Record<P, unknown>>{};
+        const propertiesToWatch = {} as Record<P, unknown>;
 
         this.properties.forEach((property) => {
           const isComputedProperty = isComputedProp(target, property.key);
