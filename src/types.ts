@@ -1,10 +1,11 @@
 import { IAutorunOptions } from 'mobx';
+import { SerializableProperty } from './serializableProperty';
 
 export type ReactionOptions = IAutorunOptions & { fireImmediately?: boolean };
 
-export interface PersistenceStorageOptions<P> extends StorageOptions {
+export interface PersistenceStorageOptions<T, P extends keyof T> extends StorageOptions {
   name: string;
-  properties: P[];
+  properties: (P | SerializableProperty<T, P>)[];
 }
 
 export interface StorageOptions {

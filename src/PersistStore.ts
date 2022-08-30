@@ -14,6 +14,7 @@ import { PersistStoreMap } from './PersistStoreMap';
 import { PersistenceStorageOptions, ReactionOptions } from './types';
 import { StorageAdapter } from './StorageAdapter';
 import { mpsConfig, mpsReactionOptions } from './configurePersistable';
+import { makeSerializableProperties, SerializableProperty } from './serializableProperty';
 import {
   actionPersistWarningIf,
   computedPersistWarningIf,
@@ -24,7 +25,7 @@ import {
 
 export class PersistStore<T, P extends keyof T> {
   private cancelWatch: IReactionDisposer | null = null;
-  private properties: string[] = [];
+  private properties: SerializableProperty<T, P>[] = [];
   private reactionOptions: ReactionOptions = {};
   private storageAdapter: StorageAdapter | null = null;
   private target: T | null = null;
@@ -34,10 +35,10 @@ export class PersistStore<T, P extends keyof T> {
   public isPersisting = false;
   public readonly storageName: string = '';
 
-  constructor(target: T, options: PersistenceStorageOptions<P>, reactionOptions: ReactionOptions = {}) {
+  constructor(target: T, options: PersistenceStorageOptions<T, P>, reactionOptions: ReactionOptions = {}) {
     this.target = target;
     this.storageName = options.name;
-    this.properties = options.properties as string[];
+    this.properties = makeSerializableProperties(options.properties);
     this.reactionOptions = Object.assign({ fireImmediately: true }, mpsReactionOptions, reactionOptions);
     this.debugMode = options.debugMode ?? mpsConfig.debugMode ?? false;
     this.storageAdapter = new StorageAdapter({
@@ -93,27 +94,28 @@ export class PersistStore<T, P extends keyof T> {
     });
 
     if (this.storageAdapter && this.target) {
-      const data: Record<string, unknown> | undefined = await this.storageAdapter.getItem(this.storageName);
+      const data: Record<P, unknown> | undefined = await this.storageAdapter.getItem<Record<P, unknown>>(this.storageName);
 
       // Reassigning so TypeScript doesn't complain (Object is possibly 'null') about this.target within forEach
       const target: any = this.target;
 
       if (data) {
         runInAction(() => {
-          this.properties.forEach((propertyName: string) => {
+          this.properties.forEach((property) => {
             const allowPropertyHydration = [
-              target.hasOwnProperty(propertyName),
-              typeof data[propertyName] !== 'undefined',
+              target.hasOwnProperty(property.key),
+              typeof data[property.key] !== 'undefined',
             ].every(Boolean);
 
             if (allowPropertyHydration) {
-              const propertyData = data[propertyName];
+              const propertyData = data[property.key];
 
-              if (target[propertyName] instanceof ObservableMap && isArrayForMap(propertyData)) {
-                target[propertyName] = new Map(propertyData);
+              if (target[property.key] instanceof ObservableMap && isArrayForMap(propertyData)) {
+                target[property.key] = property.deserialize(new Map(propertyData));
               } else {
-                target[propertyName] = propertyData;
+                target[property.key] = property.deserialize(propertyData);
               }
+
             }
           });
         });
@@ -140,17 +142,17 @@ export class PersistStore<T, P extends keyof T> {
 
     this.cancelWatch = reaction(
       () => {
-        const propertiesToWatch: Record<string, unknown> = {};
+        const propertiesToWatch = {} as Record<P, unknown>;
 
-        this.properties.forEach((propertyName: string) => {
-          const isComputedProperty = isComputedProp(target, String(propertyName));
-          const isActionProperty = isAction(target[propertyName]);
+        this.properties.forEach((property) => {
+          const isComputedProperty = isComputedProp(target, property.key);
+          const isActionProperty = isAction(target[property.key]);
 
-          computedPersistWarningIf(isComputedProperty, propertyName);
-          actionPersistWarningIf(isActionProperty, propertyName);
+          computedPersistWarningIf(isComputedProperty, String(property.key));
+          actionPersistWarningIf(isActionProperty, String(property.key));
 
           if (!isComputedProperty && !isActionProperty) {
-            let propertyData = target[propertyName];
+            let propertyData = property.serialize(target[property.key]);
 
             if (propertyData instanceof ObservableMap) {
               const mapArray: any = [];
@@ -160,7 +162,7 @@ export class PersistStore<T, P extends keyof T> {
               propertyData = mapArray;
             }
 
-            propertiesToWatch[propertyName] = toJS(propertyData);
+            propertiesToWatch[property.key] = toJS(propertyData);
           }
         });
 
@@ -222,4 +224,6 @@ export class PersistStore<T, P extends keyof T> {
 
     return null;
   }
+
 }
+
