@@ -29,7 +29,7 @@ export const isObjectWithProperties = (data: any): boolean => {
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const isFunction = (functionToCheck: any): boolean => {
-  return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+  return functionToCheck && functionToCheck instanceof Function;
 };
 
 export const isStorageControllerLike = (value: StorageController | Storage | undefined): value is StorageController => {
