@@ -16,6 +16,7 @@
 - [Demo](#demo)
 - [Getting Started](#getting-started)
 - [Simple Example](#simple-example)
+- [Example With SerializableProperties](#example-with-serializableproperties)
 - [Example With All Options](#example-with-all-options)
 - [Global Configuration](#global-configuration)
 - [API](#api)
@@ -73,6 +74,37 @@ export class SampleStore {
     makeAutoObservable(this);
 
     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'], storage: window.localStorage });
+  }
+}
+```
+
+### Example With SerializableProperties
+
+```javascript
+import { makeAutoObservable } from 'mobx';
+import { makePersistable } from 'mobx-persist-store';
+
+export class SampleStore {
+  someProperty: ['a', 'b', 'c'];
+
+  constructor() {
+    makeAutoObservable(this);
+
+    makePersistable(this, {
+      name: 'SampleStore',
+      properties: [
+        {
+          key: 'someProperty',
+          serialize: (value) => {
+            return value.join(',');
+          },
+          deserialize: (value) => {
+            return value.split(',');
+          },
+        },
+      ],
+      storage: window.localStorage,
+    });
   }
 }
 ```
