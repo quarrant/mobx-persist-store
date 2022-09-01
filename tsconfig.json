@@ -13,5 +13,5 @@
     "jsx": "react"
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["**/*.test.ts", "node_modules"]
+  "exclude": ["**/*.test.ts", "node_modules", "setup-fake-timers.ts"]
 }
