@@ -94,7 +94,9 @@ export class PersistStore<T, P extends keyof T> {
     });
 
     if (this.storageAdapter && this.target) {
-      const data: Record<P, unknown> | undefined = await this.storageAdapter.getItem<Record<P, unknown>>(this.storageName);
+      const data: Record<P, unknown> | undefined = await this.storageAdapter.getItem<Record<P, unknown>>(
+        this.storageName
+      );
 
       // Reassigning so TypeScript doesn't complain (Object is possibly 'null') about this.target within forEach
       const target: any = this.target;
@@ -115,7 +117,6 @@ export class PersistStore<T, P extends keyof T> {
               } else {
                 target[property.key] = property.deserialize(propertyData);
               }
-
             }
           });
         });
@@ -224,6 +225,4 @@ export class PersistStore<T, P extends keyof T> {
 
     return null;
   }
-
 }
-

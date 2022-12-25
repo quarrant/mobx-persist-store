@@ -100,9 +100,9 @@ describe('StorePersist', () => {
       );
 
       const storage = {
-        setItem: (key: string, value: string) => { },
+        setItem: (key: string, value: string) => {},
         getItem: (key: string) => '',
-        removeItem: (key: string) => { },
+        removeItem: (key: string) => {},
       };
       const storePersist = new PersistStore(
         myStore,
@@ -132,25 +132,24 @@ describe('StorePersist', () => {
     });
 
     test('should work serialize/deserialize', async () => {
-      const storePersist = new PersistStore(
-        myStore,
-        {
-          name: 'myStoreSet',
-          properties: [{
+      const storePersist = new PersistStore(myStore, {
+        name: 'myStoreSet',
+        properties: [
+          {
             key: 'list',
             // @ts-ignore
             serialize: (value) => {
-              return value.join(',')
+              return value.join(',');
             },
             // @ts-ignore
             deserialize: (value) => {
-              return value.split(',')
-            }
-          }],
-          ...persistenceStorageOptions,
-          stringify: true
-        },
-      );
+              return value.split(',');
+            },
+          },
+        ],
+        ...persistenceStorageOptions,
+        stringify: true,
+      });
 
       const spyOnSerialize = jest.spyOn(storePersist['properties'][0], 'serialize');
       const spyOnDeserialize = jest.spyOn(storePersist['properties'][0], 'deserialize');
@@ -164,20 +163,20 @@ describe('StorePersist', () => {
 
       expect(myStore.list).toEqual([]);
 
-      runInAction(() => myStore.list = ['test']);
+      runInAction(() => (myStore.list = ['test']));
 
       expect(spyOnSerialize).toBeCalledTimes(2);
       expect(spyOnDeserialize).toBeCalledTimes(0);
 
       storePersist.pausePersisting();
 
-      runInAction(() => myStore.list = []);
+      runInAction(() => (myStore.list = []));
 
       await storePersist.hydrateStore();
 
       expect(myStore.list).toEqual(['test']);
 
-      return
-    })
+      return;
+    });
   });
 });
