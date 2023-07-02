@@ -65,7 +65,7 @@ export const invalidStorageAdaptorWarningIf = (
 export const duplicatedStoreWarningIf = (hasPersistedStoreAlready: boolean, storageName: string): void => {
   if (isBrowser && isNotProductionBuild && hasPersistedStoreAlready) {
     console.warn(
-      `mobx-persist-store: 'makePersistable' was called was called with the same storage name "${storageName}".\n\n * Make sure you call "stopPersisting" before recreating "${storageName}" to avoid memory leaks. \n * Or double check you did not have two stores with the same name.`
+      `mobx-persist-store: 'makePersistable' was called with the same storage name "${storageName}".\n\n * Make sure you call "stopPersisting" before recreating "${storageName}" to avoid memory leaks. \n * Or double check you did not have two stores with the same name.`
     );
   }
 };
