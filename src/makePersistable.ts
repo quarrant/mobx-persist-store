@@ -3,6 +3,19 @@ import { PersistStore } from './PersistStore';
 import { PersistStoreMap } from './PersistStoreMap';
 import { duplicatedStoreWarningIf } from './utils';
 
+const setMobxPersistStore = <T extends { [key: string]: any }, P extends keyof T>(target: T, persistStore: PersistStore<T, P>) => {
+  if (process.env.NODE_ENV !== 'production') {
+    for (const [key, store] of PersistStoreMap.entries()) {
+      if (store.storageName === persistStore.storageName) {
+        store.stopPersisting()
+        PersistStoreMap.delete(key)
+      }
+    }
+  }
+
+  PersistStoreMap.set(target, persistStore);
+}
+
 export const makePersistable = async <T extends { [key: string]: any }, P extends keyof T>(
   target: T,
   storageOptions: PersistenceStorageOptions<T, P>,
@@ -15,8 +28,7 @@ export const makePersistable = async <T extends { [key: string]: any }, P extend
     .includes(mobxPersistStore.storageName);
 
   duplicatedStoreWarningIf(hasPersistedStoreAlready, mobxPersistStore.storageName);
-
-  PersistStoreMap.set(target, mobxPersistStore);
+  setMobxPersistStore(target, mobxPersistStore);
 
   return mobxPersistStore.init();
 };
