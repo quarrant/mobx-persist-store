@@ -153,17 +153,10 @@ export class PersistStore<T, P extends keyof T> {
           actionPersistWarningIf(isActionProperty, String(property.key));
 
           if (!isComputedProperty && !isActionProperty) {
-            let propertyData = property.serialize(target[property.key]);
+            const propertyData = property.serialize(target[property.key]);
 
-            if (propertyData instanceof ObservableMap) {
-              const mapArray: any = [];
-              propertyData.forEach((v, k) => {
-                mapArray.push([k, toJS(v)]);
-              });
-              propertyData = mapArray;
-            }
-
-            propertiesToWatch[property.key] = toJS(propertyData);
+            propertiesToWatch[property.key] =
+              typeof propertyData === 'undefined' ? undefined : JSON.parse(JSON.stringify(propertyData));
           }
         });
 
