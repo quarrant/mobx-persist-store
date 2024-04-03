@@ -29,6 +29,7 @@ export class PersistStore<T, P extends keyof T> {
   private reactionOptions: ReactionOptions = {};
   private storageAdapter: StorageAdapter | null = null;
   private target: T | null = null;
+  private version: number | undefined = undefined;
   private readonly debugMode: boolean = false;
 
   public isHydrated = false;
@@ -38,10 +39,12 @@ export class PersistStore<T, P extends keyof T> {
   constructor(target: T, options: PersistenceStorageOptions<T, P>, reactionOptions: ReactionOptions = {}) {
     this.target = target;
     this.storageName = options.name;
+    this.version = options.version ?? mpsConfig.version;
     this.properties = makeSerializableProperties(options.properties);
     this.reactionOptions = Object.assign({ fireImmediately: true }, mpsReactionOptions, reactionOptions);
     this.debugMode = options.debugMode ?? mpsConfig.debugMode ?? false;
     this.storageAdapter = new StorageAdapter({
+      version: this.version,
       expireIn: options.expireIn ?? mpsConfig.expireIn,
       removeOnExpiration: options.removeOnExpiration ?? mpsConfig.removeOnExpiration ?? true,
       stringify: options.stringify ?? mpsConfig.stringify ?? true,

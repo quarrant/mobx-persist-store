@@ -254,4 +254,86 @@ describe('StorageAdapter', () => {
       });
     });
   });
+
+  describe('version option', () => {
+    describe('getItem', () => {
+      const testLocalStorage = {
+        setItem: setItemTestHandler,
+        getItem: getItemTestHandler,
+        removeItem: removeItemTestHandler,
+      };
+
+      beforeEach(() => {
+        testStorage = {};
+        storageAdapter = new StorageAdapter({
+          stringify: false, // easier to test when data is not a string
+          version: 1,
+          storage: testLocalStorage,
+        });
+      });
+
+      test(`should remove data from the storage when the version is changed`, async () => {
+        await storageAdapter.setItem('mockStore', mockStore);
+        await storageAdapter.getItem('mockStore');
+
+        storageAdapter = new StorageAdapter({
+          stringify: false,
+          version: 2,
+          storage: testLocalStorage,
+        });
+
+        await storageAdapter.getItem('mockStore');
+
+        const actualResult = testStorage['mockStore'];
+        const expectedResult = undefined;
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+
+      test(`shouldn't remove data from the storage when the version isn't changed`, async () => {
+        await storageAdapter.setItem('mockStore', mockStore);
+        await storageAdapter.getItem('mockStore');
+
+        storageAdapter = new StorageAdapter({
+          stringify: false,
+          version: 1,
+          storage: testLocalStorage,
+        });
+
+        await storageAdapter.getItem('mockStore');
+
+        const actualResult = testStorage['mockStore'];
+        const expectedResult = {
+          ...mockStore,
+          __mps__: {
+            version: 1,
+          },
+        };
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+
+      test(`shouldn't remove data if the version disappeared`, async () => {
+        await storageAdapter.setItem('mockStore', mockStore);
+        await storageAdapter.getItem('mockStore');
+
+        storageAdapter = new StorageAdapter({
+          stringify: false,
+          storage: testLocalStorage,
+        });
+
+        await storageAdapter.getItem('mockStore');
+
+        const actualResult = testStorage['mockStore'];
+        const expectedResult = {
+          ...mockStore,
+          __mps__: {
+            version: 1,
+          },
+        };
+
+        expect(actualResult).toEqual(expectedResult);
+      });
+    });
+  });
 });
