@@ -27,11 +27,11 @@
   },
   "scripts": {
     "---------- Building ----------------------------------------------------": "",
-    "build": "rm -rf lib && yarn build:esm5 && yarn build:esm2015 && yarn build:esm2017",
+    "build": "rm -rf lib && npm run build:esm5 && npm run build:esm2015 && npm run build:esm2017",
     "build:esm5": "tsc --project tsconfig.esm5.json",
     "build:esm2015": "tsc --project tsconfig.esm2015.json",
     "build:esm2017": "tsc --project tsconfig.json",
-    "prepublishOnly": "yarn build",
+    "prepublishOnly": "npm run build",
     "npm:release": "bash scripts/make-release-branch.sh",
     "---------- Testing ----------------------------------------------------": "",
     "test": "jest",
@@ -39,7 +39,6 @@
     "ts": "tsc --noEmit",
     "---------- helper commands --------------------------------------------": "",
     "prettier": "npx prettier --write \"./**/*.{ts,tsx,js,jsx,json,md}\"",
-    "up": "yarn upgrade-interactive --latest",
     "-----------------------------------------------------------------------": ""
   },
   "peerDependencies": {
