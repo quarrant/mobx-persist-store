@@ -31,22 +31,25 @@ const isSerializableProperty = <T, P extends keyof T>(obj: any): obj is Serializ
 export const makeSerializableProperties = <T, P extends keyof T>(
   properties: PersistenceStorageOptions<T, P>['properties']
 ): SerializableProperty<T, P>[] => {
-  return properties.reduce((acc, curr) => {
-    if (typeof curr === 'string') {
-      acc.push({
-        key: curr,
-        serialize: <V>(value: V) => value,
-        deserialize: (value: any) => value,
-      });
+  return properties.reduce(
+    (acc, curr) => {
+      if (typeof curr === 'string') {
+        acc.push({
+          key: curr,
+          serialize: <V>(value: V) => value,
+          deserialize: (value: any) => value,
+        });
+
+        return acc;
+      }
+
+      if (isSerializableProperty<T, P>(curr)) {
+        acc.push(curr);
+        return acc;
+      }
 
       return acc;
-    }
-
-    if (isSerializableProperty<T, P>(curr)) {
-      acc.push(curr);
-      return acc;
-    }
-
-    return acc;
-  }, [] as SerializableProperty<T, P>[]);
+    },
+    [] as SerializableProperty<T, P>[]
+  );
 };
