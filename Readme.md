@@ -427,7 +427,7 @@ You should only need `makePersistable` but this library also provides other util
 >     makePersistable(this, { name: 'SampleStore', properties: ['someProperty'] });
 >   }
 >
->   async clearStoredDate() {
+>   async clearStoredData() {
 >     await clearPersistedStore(this);
 >   }
 > }
