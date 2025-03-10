@@ -167,6 +167,30 @@ export class SampleStore {
 
 `configurePersistable` sets items globally, but you can override them within `makePersistable`.
 
+## ES6 Map and Set Support
+
+This library has built-in support for persisting ES6 Map and Set objects. When a property is an instance of `ObservableMap` or `ObservableSet`, it will be automatically serialized to an array format and then deserialized back to a Map or Set when the store is hydrated.
+
+```javascript
+import { makeAutoObservable } from 'mobx';
+import { makePersistable } from 'mobx-persist-store';
+
+export class SampleStore {
+  mapProperty = new Map([['key1', 'value1'], ['key2', 'value2']]);
+  setProperty = new Set(['item1', 'item2', 'item3']);
+
+  constructor() {
+    makeAutoObservable(this);
+
+    makePersistable(this, {
+      name: 'SampleStore',
+      properties: ['mapProperty', 'setProperty'],
+      storage: window.localStorage,
+    });
+  }
+}
+```
+
 ## API
 
 You should only need `makePersistable` but this library also provides other utils for more advance usage.

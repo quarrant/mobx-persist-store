@@ -6,6 +6,7 @@ import {
   makeObservable,
   observable,
   ObservableMap,
+  ObservableSet,
   reaction,
   runInAction,
   toJS,
@@ -21,6 +22,7 @@ import {
   consoleDebug,
   invalidStorageAdaptorWarningIf,
   isArrayForMap,
+  isArrayForSet,
 } from './utils';
 
 export class PersistStore<T, P extends keyof T> {
@@ -117,6 +119,8 @@ export class PersistStore<T, P extends keyof T> {
 
               if (target[property.key] instanceof ObservableMap && isArrayForMap(propertyData)) {
                 target[property.key] = property.deserialize(new Map(propertyData));
+              } else if (target[property.key] instanceof ObservableSet && isArrayForSet(propertyData)) {
+                target[property.key] = property.deserialize(new Set(propertyData));
               } else {
                 target[property.key] = property.deserialize(propertyData);
               }
@@ -159,11 +163,17 @@ export class PersistStore<T, P extends keyof T> {
             let propertyData = property.serialize(target[property.key]);
 
             if (propertyData instanceof ObservableMap) {
-              const mapArray: any = [];
-              propertyData.forEach((v, k) => {
+              const mapArray: any[] = [];
+              propertyData.forEach((v: any, k: any) => {
                 mapArray.push([k, toJS(v)]);
               });
               propertyData = mapArray;
+            } else if (propertyData instanceof ObservableSet) {
+              const setArray: any[] = [];
+              propertyData.forEach((v: any) => {
+                setArray.push(toJS(v));
+              });
+              propertyData = setArray;
             }
 
             propertiesToWatch[property.key] = toJS(propertyData);
