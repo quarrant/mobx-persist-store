@@ -108,7 +108,7 @@ export class PersistStore<T, P extends keyof T> {
         runInAction(() => {
           this.properties.forEach((property) => {
             const allowPropertyHydration = [
-              target.hasOwnProperty(property.key),
+              property.key in target || target.hasOwnProperty(property.key),
               typeof data[property.key] !== 'undefined',
             ].every(Boolean);
 
