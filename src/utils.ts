@@ -100,6 +100,10 @@ export const isArrayForMap = (value: unknown): value is [any, any][] => {
   return false;
 };
 
+export const isArrayForSet = (value: unknown): value is any[] => {
+  return Array.isArray(value);
+};
+
 export const omitObjectProperties = <V>(obj: Record<string, V>, testFn: (value: V) => boolean) => {
   Object.keys(obj).forEach((key) => testFn(obj[key]) && delete obj[key]);
   return obj;
