@@ -163,8 +163,8 @@ export class PersistStore<T, P extends keyof T> {
             let propertyData = property.serialize(target[property.key]);
 
             if (propertyData instanceof ObservableMap) {
-              const mapArray: any[] = [];
-              propertyData.forEach((v: any, k: any) => {
+              const mapArray: any = [];
+              propertyData.forEach((v, k) => {
                 mapArray.push([k, toJS(v)]);
               });
               propertyData = mapArray;
