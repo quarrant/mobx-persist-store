@@ -169,7 +169,7 @@ export class PersistStore<T, P extends keyof T> {
               });
               propertyData = mapArray;
             } else if (propertyData instanceof ObservableSet) {
-              propertyData = propertyData.map(toJS);
+              propertyData = Array.from(propertyData).map(toJS);
             }
 
             propertiesToWatch[property.key] = toJS(propertyData);
