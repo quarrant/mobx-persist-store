@@ -176,7 +176,10 @@ import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
 
 export class SampleStore {
-  mapProperty = new Map([['key1', 'value1'], ['key2', 'value2']]);
+  mapProperty = new Map([
+    ['key1', 'value1'],
+    ['key2', 'value2'],
+  ]);
   setProperty = new Set(['item1', 'item2', 'item3']);
 
   constructor() {

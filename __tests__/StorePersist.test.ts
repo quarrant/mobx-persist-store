@@ -9,9 +9,13 @@ import { ReactionOptions, StorageOptions, PersistStore, configurePersistable } f
 
 class MyStore {
   list: string[] = [];
+  setData: Set<string> = new Set();
 
   constructor() {
-    makeObservable(this, { list: observable });
+    makeObservable(this, {
+      list: observable,
+      setData: observable,
+    });
   }
 }
 
@@ -146,6 +150,17 @@ describe('StorePersist', () => {
               return value.split(',');
             },
           },
+          {
+            key: 'setData',
+            // @ts-ignore
+            serialize: (value) => {
+              return Array.from(value).join('|');
+            },
+            // @ts-ignore
+            deserialize: (value) => {
+              return new Set(value.split('|').filter(Boolean));
+            },
+          },
         ],
         ...persistenceStorageOptions,
         stringify: true,
@@ -162,19 +177,32 @@ describe('StorePersist', () => {
       expect(spyOnDeserialize).toBeCalledTimes(0);
 
       expect(myStore.list).toEqual([]);
+      expect(myStore.setData.size).toEqual(0);
 
-      runInAction(() => (myStore.list = ['test']));
+      runInAction(() => {
+        myStore.list = ['test'];
+        myStore.setData.add('item1');
+        myStore.setData.add('item2');
+      });
 
       expect(spyOnSerialize).toBeCalledTimes(2);
       expect(spyOnDeserialize).toBeCalledTimes(0);
 
       storePersist.pausePersisting();
 
-      runInAction(() => (myStore.list = []));
+      runInAction(() => {
+        myStore.list = [];
+        myStore.setData.clear();
+      });
+
+      expect(myStore.list).toEqual([]);
+      expect(myStore.setData.size).toEqual(0);
 
       await storePersist.hydrateStore();
 
       expect(myStore.list).toEqual(['test']);
+      expect(myStore.setData.has('item1')).toBe(true);
+      expect(myStore.setData.has('item2')).toBe(true);
 
       return;
     });
